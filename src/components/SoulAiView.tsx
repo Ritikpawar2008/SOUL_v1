@@ -214,7 +214,7 @@ How can I optimize your academic flow right now?`,
             <div className="flex items-center gap-3">
               <h3 className="font-display font-black text-xl text-white uppercase tracking-tight">SOUL INTELLIGENCE CO-PILOT</h3>
               <span className="px-2 py-0.5 bg-cyan-400/20 text-cyan-300 text-[9px] font-mono font-black uppercase tracking-wider">
-                GEMINI 3.7 FLASH
+                GROQ • LLAMA 3.3 70B
               </span>
             </div>
             <p className="text-xs font-mono text-white/50 uppercase mt-0.5">

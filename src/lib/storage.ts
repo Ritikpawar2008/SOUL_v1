@@ -18,16 +18,17 @@ import {
   INITIAL_TIMETABLE,
   INITIAL_POST_GYM_ROUTINE,
 } from '../data/initialData';
+import { triggerSupabaseSync, fetchStateFromSupabase, isSupabaseConfigured } from './supabase';
 
 const STORAGE_KEYS = {
-  PREFERENCES: 'soul_preferences_v4',
-  TIMETABLE: 'soul_timetable_v4',
-  SUBJECTS: 'soul_subjects_v4',
-  TASKS: 'soul_tasks_v4',
-  HABITS: 'soul_habits_v4',
-  FOCUS_SESSIONS: 'soul_focus_sessions_v4',
-  HISTORY: 'soul_history_v4',
-  POST_GYM_ROUTINE: 'soul_post_gym_routine_v4',
+  PREFERENCES: 'soul_preferences_v5',
+  TIMETABLE: 'soul_timetable_v5',
+  SUBJECTS: 'soul_subjects_v5',
+  TASKS: 'soul_tasks_v5',
+  HABITS: 'soul_habits_v5',
+  FOCUS_SESSIONS: 'soul_focus_sessions_v5',
+  HISTORY: 'soul_history_v5',
+  POST_GYM_ROUTINE: 'soul_post_gym_routine_v5',
 };
 
 export class StorageService {
@@ -42,6 +43,7 @@ export class StorageService {
 
   static savePreferences(prefs: UserPreferences): void {
     localStorage.setItem(STORAGE_KEYS.PREFERENCES, JSON.stringify(prefs));
+    this.pushCurrentStateToCloud();
     window.dispatchEvent(new Event('soul_data_changed'));
   }
 
@@ -56,6 +58,7 @@ export class StorageService {
 
   static saveTimetable(slots: TimetableSlot[]): void {
     localStorage.setItem(STORAGE_KEYS.TIMETABLE, JSON.stringify(slots));
+    this.pushCurrentStateToCloud();
     window.dispatchEvent(new Event('soul_data_changed'));
   }
 
@@ -70,6 +73,7 @@ export class StorageService {
 
   static saveSubjects(subjects: Subject[]): void {
     localStorage.setItem(STORAGE_KEYS.SUBJECTS, JSON.stringify(subjects));
+    this.pushCurrentStateToCloud();
     window.dispatchEvent(new Event('soul_data_changed'));
   }
 
@@ -84,6 +88,7 @@ export class StorageService {
 
   static saveTasks(tasks: AcademicTask[]): void {
     localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
+    this.pushCurrentStateToCloud();
     window.dispatchEvent(new Event('soul_data_changed'));
   }
 
@@ -98,6 +103,7 @@ export class StorageService {
 
   static saveHabits(habits: HabitGoal[]): void {
     localStorage.setItem(STORAGE_KEYS.HABITS, JSON.stringify(habits));
+    this.pushCurrentStateToCloud();
     window.dispatchEvent(new Event('soul_data_changed'));
   }
 
@@ -113,6 +119,7 @@ export class StorageService {
   static saveFocusSession(session: FocusSession): void {
     const existing = this.getFocusSessions();
     localStorage.setItem(STORAGE_KEYS.FOCUS_SESSIONS, JSON.stringify([session, ...existing]));
+    this.pushCurrentStateToCloud();
     window.dispatchEvent(new Event('soul_data_changed'));
   }
 
@@ -127,6 +134,7 @@ export class StorageService {
 
   static saveActivityHistory(items: ActivityHistoryItem[]): void {
     localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(items));
+    this.pushCurrentStateToCloud();
     window.dispatchEvent(new Event('soul_data_changed'));
   }
 
@@ -168,7 +176,6 @@ export class StorageService {
             // If freshly completed, schedule spaced repetition
             let updatedRevisions = [...unit.revisions];
             if (newStatus === 'completed' && (!unit.completedDate || unit.status !== 'completed')) {
-              // Calculate Spaced Repetition dates from TODAY
               const r1Date = new Date();
               r1Date.setDate(r1Date.getDate() + 1); // +1 day
 
@@ -231,11 +238,13 @@ export class StorageService {
 
   static savePostGymRoutine(routine: PostGymSlot[]): void {
     localStorage.setItem(STORAGE_KEYS.POST_GYM_ROUTINE, JSON.stringify(routine));
+    this.pushCurrentStateToCloud();
     window.dispatchEvent(new Event('soul_data_changed'));
   }
 
   static resetPostGymRoutine(): PostGymSlot[] {
     localStorage.removeItem(STORAGE_KEYS.POST_GYM_ROUTINE);
+    this.pushCurrentStateToCloud();
     window.dispatchEvent(new Event('soul_data_changed'));
     return INITIAL_POST_GYM_ROUTINE;
   }
@@ -250,6 +259,64 @@ export class StorageService {
   }
 
   /**
+   * Helper to push all local state to Supabase in the background
+   */
+  static pushCurrentStateToCloud(): void {
+    if (!isSupabaseConfigured()) return;
+    try {
+      triggerSupabaseSync({
+        preferences: this.getPreferences(),
+        timetable: this.getTimetable(),
+        subjects: this.getSubjects(),
+        tasks: this.getTasks(),
+        habits: this.getHabits(),
+        history: this.getActivityHistory(),
+        postGymRoutine: this.getPostGymRoutine(),
+      });
+    } catch (e) {
+      console.warn('Could not sync to Supabase:', e);
+    }
+  }
+
+  /**
+   * Fetch from Supabase and sync down to localStorage
+   */
+  static async hydrateFromSupabase(): Promise<boolean> {
+    try {
+      const cloudData = await fetchStateFromSupabase();
+      if (!cloudData) return false;
+
+      if (cloudData.preferences && Object.keys(cloudData.preferences).length > 0) {
+        localStorage.setItem(STORAGE_KEYS.PREFERENCES, JSON.stringify(cloudData.preferences));
+      }
+      if (Array.isArray(cloudData.timetable) && cloudData.timetable.length > 0) {
+        localStorage.setItem(STORAGE_KEYS.TIMETABLE, JSON.stringify(cloudData.timetable));
+      }
+      if (Array.isArray(cloudData.subjects) && cloudData.subjects.length > 0) {
+        localStorage.setItem(STORAGE_KEYS.SUBJECTS, JSON.stringify(cloudData.subjects));
+      }
+      if (Array.isArray(cloudData.tasks)) {
+        localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(cloudData.tasks));
+      }
+      if (Array.isArray(cloudData.habits)) {
+        localStorage.setItem(STORAGE_KEYS.HABITS, JSON.stringify(cloudData.habits));
+      }
+      if (Array.isArray(cloudData.history)) {
+        localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(cloudData.history));
+      }
+      if (Array.isArray(cloudData.postGymRoutine)) {
+        localStorage.setItem(STORAGE_KEYS.POST_GYM_ROUTINE, JSON.stringify(cloudData.postGymRoutine));
+      }
+
+      window.dispatchEvent(new Event('soul_data_changed'));
+      return true;
+    } catch (e) {
+      console.error('Hydration from Supabase failed:', e);
+      return false;
+    }
+  }
+
+  /**
    * Reset all data back to clean factory initial state
    */
   static resetToDefault(): void {
@@ -261,6 +328,7 @@ export class StorageService {
     localStorage.removeItem(STORAGE_KEYS.FOCUS_SESSIONS);
     localStorage.removeItem(STORAGE_KEYS.HISTORY);
     localStorage.removeItem(STORAGE_KEYS.POST_GYM_ROUTINE);
+    this.pushCurrentStateToCloud();
     window.dispatchEvent(new Event('soul_data_changed'));
   }
 
@@ -288,13 +356,15 @@ export class StorageService {
   static importFullBackup(jsonString: string): boolean {
     try {
       const parsed = JSON.parse(jsonString);
-      if (parsed.timetable) this.saveTimetable(parsed.timetable);
-      if (parsed.subjects) this.saveSubjects(parsed.subjects);
-      if (parsed.tasks) this.saveTasks(parsed.tasks);
-      if (parsed.habits) this.saveHabits(parsed.habits);
-      if (parsed.preferences) this.savePreferences(parsed.preferences);
-      if (parsed.history) this.saveActivityHistory(parsed.history);
-      if (parsed.postGymRoutine) this.savePostGymRoutine(parsed.postGymRoutine);
+      if (parsed.timetable) localStorage.setItem(STORAGE_KEYS.TIMETABLE, JSON.stringify(parsed.timetable));
+      if (parsed.subjects) localStorage.setItem(STORAGE_KEYS.SUBJECTS, JSON.stringify(parsed.subjects));
+      if (parsed.tasks) localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(parsed.tasks));
+      if (parsed.habits) localStorage.setItem(STORAGE_KEYS.HABITS, JSON.stringify(parsed.habits));
+      if (parsed.preferences) localStorage.setItem(STORAGE_KEYS.PREFERENCES, JSON.stringify(parsed.preferences));
+      if (parsed.history) localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(parsed.history));
+      if (parsed.postGymRoutine) localStorage.setItem(STORAGE_KEYS.POST_GYM_ROUTINE, JSON.stringify(parsed.postGymRoutine));
+      this.pushCurrentStateToCloud();
+      window.dispatchEvent(new Event('soul_data_changed'));
       return true;
     } catch (e) {
       console.error('Import failed', e);

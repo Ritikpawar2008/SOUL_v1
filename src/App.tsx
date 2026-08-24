@@ -142,6 +142,21 @@ export default function App() {
     return () => clearInterval(timer);
   }, [simulatedTimeOffset]);
 
+  // Hydrate from Supabase Cloud on mount if connected
+  useEffect(() => {
+    StorageService.hydrateFromSupabase().then(synced => {
+      if (synced) {
+        setPreferences(StorageService.getPreferences());
+        setTimetable(StorageService.getTimetable());
+        setSubjects(StorageService.getSubjects());
+        setTasks(StorageService.getTasks());
+        setHabits(StorageService.getHabits());
+        setHistory(StorageService.getActivityHistory());
+        setPostGymRoutine(StorageService.getPostGymRoutine());
+      }
+    });
+  }, []);
+
   // Listen to Storage Sync Events
   useEffect(() => {
     const handleStorageChange = () => {
@@ -151,9 +166,14 @@ export default function App() {
       setTasks(StorageService.getTasks());
       setHabits(StorageService.getHabits());
       setHistory(StorageService.getActivityHistory());
+      setPostGymRoutine(StorageService.getPostGymRoutine());
     };
     window.addEventListener('soul_data_changed', handleStorageChange);
-    return () => window.removeEventListener('soul_data_changed', handleStorageChange);
+    window.addEventListener('soul_supabase_config_changed', handleStorageChange);
+    return () => {
+      window.removeEventListener('soul_data_changed', handleStorageChange);
+      window.removeEventListener('soul_supabase_config_changed', handleStorageChange);
+    };
   }, []);
 
   // Time simulation handler
