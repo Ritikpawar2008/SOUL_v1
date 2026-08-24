@@ -19,9 +19,11 @@ export function getSupabaseCredentials(): { url: string; key: string } {
     customKey = localStorage.getItem(SUPABASE_STORAGE_KEYS.KEY) || '';
   } catch {}
 
+  const defaultUrl = 'https://tpstlqalinybpmtsmfhf.supabase.co';
+
   return {
-    url: (customUrl || envUrl || '').trim(),
-    key: (customKey || envKey || '').trim(),
+    url: (customUrl || envUrl || defaultUrl).trim(),
+    key: (customKey || envKey).trim(),
   };
 }
 
