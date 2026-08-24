@@ -47,7 +47,21 @@ export class StorageService {
   static getPreferences(): UserPreferences {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.PREFERENCES);
-      return data ? JSON.parse(data) : INITIAL_PREFERENCES;
+      if (!data) return INITIAL_PREFERENCES;
+      const parsed = JSON.parse(data);
+      return {
+        ...INITIAL_PREFERENCES,
+        ...parsed,
+        batch: 'C', // Strictly Batch C
+        roastSettings: {
+          ...INITIAL_ROAST_SETTINGS,
+          ...(parsed.roastSettings || {}),
+          notifications: {
+            ...INITIAL_ROAST_SETTINGS.notifications,
+            ...(parsed.roastSettings?.notifications || {}),
+          },
+        },
+      };
     } catch {
       return INITIAL_PREFERENCES;
     }
@@ -188,7 +202,17 @@ export class StorageService {
   static getAcademicPerformance(): AcademicPerformanceData {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.PERFORMANCE);
-      return data ? JSON.parse(data) : INITIAL_ACADEMIC_PERFORMANCE;
+      if (!data) return INITIAL_ACADEMIC_PERFORMANCE;
+      const parsed = JSON.parse(data);
+      return {
+        ...INITIAL_ACADEMIC_PERFORMANCE,
+        ...parsed,
+        targetPercentage: 98,
+        scores: {
+          ...INITIAL_ACADEMIC_PERFORMANCE.scores,
+          ...(parsed.scores || {}),
+        },
+      };
     } catch {
       return INITIAL_ACADEMIC_PERFORMANCE;
     }

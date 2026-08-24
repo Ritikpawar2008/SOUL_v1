@@ -17,7 +17,7 @@ import { RoastItem, SoulRoastSettings, TaskSkipReason } from '../types';
 import { RoastEngine } from '../lib/roastEngine';
 
 interface SoulRoastBannerProps {
-  roastSettings: SoulRoastSettings;
+  roastSettings?: SoulRoastSettings;
 }
 
 export const SoulRoastBanner: React.FC<SoulRoastBannerProps> = ({ roastSettings }) => {
@@ -33,7 +33,7 @@ export const SoulRoastBanner: React.FC<SoulRoastBannerProps> = ({ roastSettings 
     return () => window.removeEventListener('soul_roast_triggered', handleRoastEvent);
   }, []);
 
-  if (!activeRoast || !roastSettings.enabled) return null;
+  if (!activeRoast || !roastSettings?.enabled) return null;
 
   return (
     <div className="fixed bottom-20 md:bottom-6 right-4 left-4 md:left-auto md:max-w-md z-50 animate-in slide-in-from-bottom-5 duration-300">

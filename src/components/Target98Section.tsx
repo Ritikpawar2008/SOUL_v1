@@ -32,7 +32,7 @@ export const Target98Section: React.FC<Target98SectionProps> = ({
   const [activeSubjectTab, setActiveSubjectTab] = useState<string>('CLC');
 
   // Form State for editing marks for a selected subject
-  const currentSubjectMarks = performance.scores[activeSubjectTab] || {};
+  const currentSubjectMarks = performance?.scores?.[activeSubjectTab] || {};
   const [ct1Obt, setCt1Obt] = useState<string>(currentSubjectMarks.ct1?.obtained?.toString() || '');
   const [ct1Max, setCt1Max] = useState<string>(currentSubjectMarks.ct1?.max?.toString() || '25');
 
@@ -51,7 +51,7 @@ export const Target98Section: React.FC<Target98SectionProps> = ({
   // Sync form when switching subject tab
   const handleSelectSubjectTab = (code: string) => {
     setActiveSubjectTab(code);
-    const marks = performance.scores[code] || {};
+    const marks = performance?.scores?.[code] || {};
     setCt1Obt(marks.ct1?.obtained?.toString() || '');
     setCt1Max(marks.ct1?.max?.toString() || '25');
     setCt2Obt(marks.ct2?.obtained?.toString() || '');
