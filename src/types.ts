@@ -242,9 +242,43 @@ export interface EntertainmentOption {
   category: 'youtube' | 'music' | 'podcast' | 'short_break' | 'educational' | 'gaming' | 'video';
   title: string;
   durationMinutes: number;
+  recommendedWhenFreeMinutes?: number;
   channelOrArtist?: string;
   source?: string;
   description?: string;
   link?: string;
   tags?: string[];
+}
+
+export interface AvailableTimeSlot {
+  startTime: string;
+  endTime: string;
+  durationMinutes: number;
+  context: 'college_gap' | 'after_college' | 'evening_post_gym' | 'weekend';
+}
+
+export interface ScheduleConflict {
+  id: string;
+  timeRange: string;
+  conflictingItem: string;
+  blockedReason: string;
+  suggestion: string;
+  suggestedSlot: {
+    startTime: string;
+    endTime: string;
+  };
+}
+
+export interface AIRecommendation {
+  id: string;
+  type: 'manual' | 'assignment' | 'revision' | 'study';
+  title: string;
+  subjectCode: string;
+  unitNumber?: number;
+  unitId?: string;
+  taskId?: string;
+  estimatedMinutes: number;
+  reason: string;
+  priorityScore: number;
+  deadlineWarning?: string;
 }

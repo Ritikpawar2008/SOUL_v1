@@ -8,7 +8,8 @@ import {
   UserPreferences,
   PostGymSlot,
   MSBTECalendarEvent,
-  AcademicPerformanceData
+  AcademicPerformanceData,
+  SubjectMarksEntry
 } from './types';
 import { StorageService } from './lib/storage';
 import { Header } from './components/Header';
@@ -26,6 +27,7 @@ import { AboutModal } from './components/AboutModal';
 import { SplashScreen } from './components/SplashScreen';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { InstallPromptBanner } from './components/InstallPromptBanner';
+import { SoulRoastBanner } from './components/SoulRoastBanner';
 
 export default function App() {
   // Navigation State

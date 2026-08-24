@@ -117,6 +117,9 @@ export function triggerSupabaseSync(state: {
   habits?: any;
   history?: any;
   postGymRoutine?: any;
+  msbteCalendar?: any;
+  performance?: any;
+  roastSettings?: any;
 }) {
   if (!isSupabaseConfigured()) return;
 
