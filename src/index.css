@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #080C0D;
+    color: #ffffff;
+  }
+  
+  h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  .font-sans {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Bold Typography Theme Panels & Accents */
+.glass-panel {
+  background: rgba(12, 18, 20, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-glow {
+  background: rgba(12, 18, 20, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(34, 211, 238, 0.35);
+  box-shadow: 0 0 35px -5px rgba(34, 211, 238, 0.15);
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Watermark typography */
+.typography-watermark {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 900;
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+  color: #ffffff;
+  opacity: 0.04;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Institutional table styling */
+.timetable-official-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.timetable-official-table th,
+.timetable-official-table td {
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* High-contrast action button */
+.btn-bold-action {
+  background-color: #ffffff;
+  color: #000000;
+  font-weight: 800;
+  font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-bold-action:hover {
+  background-color: #22d3ee;
+  color: #000000;
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
+}
+
+/* Custom minimal scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080C0D;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #22d3ee;
+}
+

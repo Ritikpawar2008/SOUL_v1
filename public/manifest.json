@@ -1,0 +1,76 @@
+{
+  "name": "SOUL",
+  "short_name": "SOUL",
+  "description": "Your personal AI operating system for student life.",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#080C0D",
+  "theme_color": "#080C0D",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Today Dashboard",
+      "short_name": "Today",
+      "description": "View today's schedule and what to do now",
+      "url": "/?tab=today",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Academic Timetable",
+      "short_name": "Planner",
+      "description": "View institutional schedule and timetable",
+      "url": "/?tab=planner",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Academics & Manuals",
+      "short_name": "Academics",
+      "description": "Track syllabus, units, and practical manuals",
+      "url": "/?tab=academics",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Deep Focus Mode",
+      "short_name": "Focus",
+      "description": "Start focused study timer with ambient sound",
+      "url": "/?tab=focus",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "SOUL AI Co-Pilot",
+      "short_name": "SOUL AI",
+      "description": "Ask questions and get instant AI academic assistance",
+      "url": "/?tab=soul_ai",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "categories": ["education", "productivity", "lifestyle", "utilities"],
+  "prefer_related_applications": false
+}

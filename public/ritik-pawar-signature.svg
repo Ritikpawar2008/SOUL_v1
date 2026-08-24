@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 200" width="420" height="200" fill="none">
+  <defs>
+    <filter id="sigGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#22d3ee" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Enclosing Stylized Dynamic Polygon Framework -->
+    <!-- Start bottom left baseline up to high apex, down to right, returning to bottom left -->
+    <path d="M 64 162 L 232 16 L 366 112" stroke-width="2.6" opacity="0.9" />
+    <path d="M 232 16 L 98 178 L 198 140" stroke-width="2.2" opacity="0.85" />
+
+    <!-- Sharp Bottom Diagonal Baseline Stroke with Terminal Dots -->
+    <path d="M 148 168 L 366 114" stroke-width="2.4" />
+    <circle cx="148" cy="168" r="3.2" fill="currentColor" />
+    <circle cx="366" cy="114" r="3.2" fill="currentColor" />
+
+    <!-- Handwritten 'Ritik' Script -->
+    <!-- 'R' capital flourish with loop and downward leg -->
+    <path d="M 122 144 C 114 112, 134 76, 156 68 C 174 60, 186 74, 180 94 C 174 112, 150 118, 140 120" stroke-width="3" />
+    <path d="M 148 116 L 168 152" stroke-width="3.2" />
+
+    <!-- 'i-t-i-k' letters connected smoothly -->
+    <!-- 'i' -->
+    <path d="M 172 136 C 176 126, 184 124, 188 138" stroke-width="2.6" />
+    <circle cx="184" cy="114" r="2.2" fill="currentColor" />
+
+    <!-- 't' with crossbar -->
+    <path d="M 194 140 L 202 108 L 206 142" stroke-width="2.8" />
+    <path d="M 190 120 L 216 118" stroke-width="2.6" />
+
+    <!-- 'i' -->
+    <path d="M 212 138 C 216 128, 222 126, 226 136" stroke-width="2.6" />
+    <circle cx="220" cy="112" r="2.2" fill="currentColor" />
+
+    <!-- 'k' with tall ascender and loop -->
+    <path d="M 230 142 L 236 96 C 238 90, 246 94, 244 108 L 238 126 L 254 136" stroke-width="2.8" />
+
+    <!-- Handwritten 'Pawar' script following Ritik -->
+    <!-- 'P' bold cursive flourish -->
+    <path d="M 258 138 L 264 92 C 266 84, 280 84, 282 100 C 284 114, 270 122, 262 122" stroke-width="3" />
+
+    <!-- 'a-w-a-r' cursive stream -->
+    <!-- 'a' -->
+    <path d="M 284 118 C 280 110, 290 108, 294 118 C 296 124, 294 130, 290 132 L 296 132" stroke-width="2.4" />
+    <!-- 'w' -->
+    <path d="M 298 122 L 302 132 L 308 120 L 312 132 L 318 122" stroke-width="2.4" />
+    <!-- 'a' -->
+    <path d="M 320 122 C 322 116, 328 116, 330 122 C 332 126, 330 130, 326 130 L 332 130" stroke-width="2.4" />
+    <!-- 'r' with end terminal -->
+    <path d="M 334 126 L 336 120 C 338 118, 344 118, 346 122 L 348 128" stroke-width="2.4" />
+
+    <!-- Double underline flourish under 'Ritik' -->
+    <path d="M 188 152 L 246 138" stroke-width="2.4" />
+    <path d="M 194 158 L 244 144" stroke-width="2" />
+  </g>
+</svg>
