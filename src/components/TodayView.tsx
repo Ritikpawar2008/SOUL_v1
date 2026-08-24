@@ -273,7 +273,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
     dailyTimelineItems.push({
       time: '22:00',
       endTime: '22:45',
-      title: 'STE / ENDS SPACED REVISION',
+      title: 'STE SPACED REVISION',
       subtitle: 'Stage 1 active recall & key definitions',
       type: 'study',
       subjectCode: 'STE',

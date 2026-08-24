@@ -6,7 +6,9 @@ import {
   Subject, 
   TimetableSlot, 
   UserPreferences,
-  PostGymSlot
+  PostGymSlot,
+  MSBTECalendarEvent,
+  AcademicPerformanceData
 } from './types';
 import { StorageService } from './lib/storage';
 import { Header } from './components/Header';
@@ -37,6 +39,8 @@ export default function App() {
   const [habits, setHabits] = useState<HabitGoal[]>(StorageService.getHabits());
   const [history, setHistory] = useState<ActivityHistoryItem[]>(StorageService.getActivityHistory());
   const [postGymRoutine, setPostGymRoutine] = useState<PostGymSlot[]>(StorageService.getPostGymRoutine());
+  const [msbteCalendar, setMsbteCalendar] = useState<MSBTECalendarEvent[]>(StorageService.getMsbteCalendar());
+  const [performance, setPerformance] = useState<AcademicPerformanceData>(StorageService.getAcademicPerformance());
 
   // Clock & Time Simulation State
   const [systemTime, setSystemTime] = useState<Date>(new Date());
@@ -153,6 +157,8 @@ export default function App() {
         setHabits(StorageService.getHabits());
         setHistory(StorageService.getActivityHistory());
         setPostGymRoutine(StorageService.getPostGymRoutine());
+        setMsbteCalendar(StorageService.getMsbteCalendar());
+        setPerformance(StorageService.getAcademicPerformance());
       }
     });
   }, []);
@@ -167,6 +173,8 @@ export default function App() {
       setHabits(StorageService.getHabits());
       setHistory(StorageService.getActivityHistory());
       setPostGymRoutine(StorageService.getPostGymRoutine());
+      setMsbteCalendar(StorageService.getMsbteCalendar());
+      setPerformance(StorageService.getAcademicPerformance());
     };
     window.addEventListener('soul_data_changed', handleStorageChange);
     window.addEventListener('soul_supabase_config_changed', handleStorageChange);
@@ -216,6 +224,16 @@ export default function App() {
     StorageService.savePreferences(newPrefs);
   };
 
+  const handleToggleMsbteReminder = (eventId: string) => {
+    const updated = StorageService.toggleMsbteReminder(eventId);
+    setMsbteCalendar(updated);
+  };
+
+  const handleSaveMarks = (subjectCode: string, marks: SubjectMarksEntry) => {
+    StorageService.saveSubjectMarks(subjectCode, marks);
+    setPerformance(StorageService.getAcademicPerformance());
+  };
+
   const handleResetAllData = () => {
     StorageService.resetToDefault();
     setPreferences(StorageService.getPreferences());
@@ -224,6 +242,9 @@ export default function App() {
     setTasks(StorageService.getTasks());
     setHabits(StorageService.getHabits());
     setHistory(StorageService.getActivityHistory());
+    setPostGymRoutine(StorageService.getPostGymRoutine());
+    setMsbteCalendar(StorageService.getMsbteCalendar());
+    setPerformance(StorageService.getAcademicPerformance());
   };
 
   // Study Session Handlers
@@ -395,9 +416,14 @@ export default function App() {
           <AcademicsView
             subjects={subjects}
             tasks={tasks}
+            msbteCalendar={msbteCalendar}
+            performance={performance}
+            currentTime={systemTime}
             onUpdateSubjects={handleUpdateSubjects}
             onUpdateTasks={handleUpdateTasks}
             onStartStudySession={handleStartStudySession}
+            onSaveMarks={handleSaveMarks}
+            onToggleMsbteReminder={handleToggleMsbteReminder}
           />
         )}
 
@@ -486,6 +512,9 @@ export default function App() {
         onTriggerInstall={handleTriggerInstall}
         isInstallable={isInstallable}
       />
+
+      {/* 6. SOUL ROAST & ACCOUNTABILITY BANNER */}
+      <SoulRoastBanner roastSettings={preferences.roastSettings} />
 
     </div>
   );

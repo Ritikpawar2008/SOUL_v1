@@ -24,32 +24,47 @@ import {
   Subject, 
   SyllabusUnit, 
   TaskStatus, 
-  UnitStatus 
+  UnitStatus,
+  MSBTECalendarEvent,
+  AcademicPerformanceData,
+  SubjectMarksEntry
 } from '../types';
 import { getDaysDifference } from '../lib/schedulingEngine';
+import { Target98Section } from './Target98Section';
+import { MsbteCalendarSection } from './MsbteCalendarSection';
 
 interface AcademicsViewProps {
   subjects: Subject[];
   tasks: AcademicTask[];
+  msbteCalendar?: MSBTECalendarEvent[];
+  performance?: AcademicPerformanceData;
+  currentTime?: Date;
   onUpdateSubjects: (subjects: Subject[]) => void;
   onUpdateTasks: (tasks: AcademicTask[]) => void;
   onStartStudySession: (item: { subjectCode: string; unitNumber?: number; title: string; taskId?: string }) => void;
+  onSaveMarks?: (subjectCode: string, marks: SubjectMarksEntry) => void;
+  onToggleMsbteReminder?: (eventId: string) => void;
 }
 
 export const AcademicsView: React.FC<AcademicsViewProps> = ({
   subjects,
   tasks,
+  msbteCalendar = [],
+  performance = { targetPercentage: 98, scores: {} },
+  currentTime = new Date(),
   onUpdateSubjects,
   onUpdateTasks,
   onStartStudySession,
+  onSaveMarks = () => {},
+  onToggleMsbteReminder = () => {},
 }) => {
-  const [activeSubTab, setActiveSubTab] = useState<'syllabus' | 'work_tracker' | 'revision_engine'>('syllabus');
+  const [activeSubTab, setActiveSubTab] = useState<'syllabus' | 'target98' | 'msbte' | 'work_tracker' | 'revision_engine'>('syllabus');
   
   // Work tracker filter
   const [taskFilter, setTaskFilter] = useState<'all' | 'manual' | 'assignment' | 'project'>('all');
   
   // Expanded subject cards in syllabus
-  const [expandedSubjectIds, setExpandedSubjectIds] = useState<string[]>(['subj-clc', 'subj-osy', 'subj-ste', 'subj-ends']);
+  const [expandedSubjectIds, setExpandedSubjectIds] = useState<string[]>(['subj-clc', 'subj-osy', 'subj-ste']);
 
   // New Task Modal State
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
@@ -302,18 +317,34 @@ export const AcademicsView: React.FC<AcademicsViewProps> = ({
         </div>
 
         {/* Sub-Tab Navigation Buttons */}
-        <div className="flex items-center p-1 bg-white/5 border border-white/10 font-mono text-xs relative z-10">
+        <div className="flex items-center p-1 bg-white/5 border border-white/10 font-mono text-xs relative z-10 flex-wrap gap-1">
           <button
             onClick={() => setActiveSubTab('syllabus')}
-            className={`px-4 py-2 uppercase font-black tracking-wider transition cursor-pointer text-xs ${
+            className={`px-3.5 py-2 uppercase font-black tracking-wider transition cursor-pointer text-xs ${
               activeSubTab === 'syllabus' ? 'bg-white text-black' : 'text-white/50 hover:text-white'
             }`}
           >
             SYLLABUS & UNITS
           </button>
           <button
+            onClick={() => setActiveSubTab('target98')}
+            className={`px-3.5 py-2 uppercase font-black tracking-wider transition cursor-pointer text-xs ${
+              activeSubTab === 'target98' ? 'bg-amber-400 text-black font-black' : 'text-amber-300/70 hover:text-amber-300'
+            }`}
+          >
+            🎯 98% TARGET
+          </button>
+          <button
+            onClick={() => setActiveSubTab('msbte')}
+            className={`px-3.5 py-2 uppercase font-black tracking-wider transition cursor-pointer text-xs ${
+              activeSubTab === 'msbte' ? 'bg-cyan-400 text-black font-black' : 'text-cyan-300/70 hover:text-cyan-300'
+            }`}
+          >
+            📅 MSBTE CALENDAR
+          </button>
+          <button
             onClick={() => setActiveSubTab('work_tracker')}
-            className={`px-4 py-2 uppercase font-black tracking-wider transition cursor-pointer text-xs ${
+            className={`px-3.5 py-2 uppercase font-black tracking-wider transition cursor-pointer text-xs ${
               activeSubTab === 'work_tracker' ? 'bg-white text-black' : 'text-white/50 hover:text-white'
             }`}
           >
@@ -321,7 +352,7 @@ export const AcademicsView: React.FC<AcademicsViewProps> = ({
           </button>
           <button
             onClick={() => setActiveSubTab('revision_engine')}
-            className={`px-4 py-2 uppercase font-black tracking-wider transition cursor-pointer text-xs ${
+            className={`px-3.5 py-2 uppercase font-black tracking-wider transition cursor-pointer text-xs ${
               activeSubTab === 'revision_engine' ? 'bg-white text-black' : 'text-white/50 hover:text-white'
             }`}
           >
@@ -808,6 +839,24 @@ export const AcademicsView: React.FC<AcademicsViewProps> = ({
         </div>
       )}
 
+      {/* 2. 98% TARGET SYSTEM SUB-TAB */}
+      {activeSubTab === 'target98' && (
+        <Target98Section
+          performance={performance}
+          subjects={subjects}
+          onSaveMarks={onSaveMarks}
+        />
+      )}
+
+      {/* 3. MSBTE EXAM CALENDAR SUB-TAB */}
+      {activeSubTab === 'msbte' && (
+        <MsbteCalendarSection
+          events={msbteCalendar}
+          currentTime={currentTime}
+          onToggleReminder={onToggleMsbteReminder}
+        />
+      )}
+
       {/* NEW ACADEMIC TASK / ASSIGNMENT / MANUAL MODAL */}
       {isTaskModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
@@ -859,8 +908,8 @@ export const AcademicsView: React.FC<AcademicsViewProps> = ({
                   <label className="text-white/60 uppercase text-[10px] font-bold tracking-wider">Subject</label>
                   <span className="text-[10px] text-cyan-400 font-bold">{taskFormSubject}</span>
                 </div>
-                <div className="grid grid-cols-4 gap-1.5">
-                  {['OSY', 'CLC', 'STE', 'ENDS'].map(code => (
+                <div className="grid grid-cols-3 gap-1.5">
+                  {['OSY', 'CLC', 'STE'].map(code => (
                     <button
                       key={code}
                       type="button"

@@ -21,7 +21,7 @@ export interface TimetableSlot {
   startTime: string; // e.g. "09:00"
   endTime: string;   // e.g. "11:00"
   title: string;     // e.g. "OSY (TH)"
-  subjectCode?: string; // e.g. "OSY", "CLC", "STE", "ENDS", "SPI"
+  subjectCode?: string; // e.g. "OSY", "CLC", "STE", "SPI"
   type: 'lecture' | 'practical' | 'mentor_meeting' | 'recess' | 'free' | 'gym' | 'study' | 'custom';
   room?: string;
   instructor?: string;
@@ -74,6 +74,7 @@ export interface AcademicTask {
   progress: number; // 0 - 100
   estimatedMinutes: number;
   actualMinutesSpent: number;
+  postponedCount?: number;
   scheduledTime?: {
     date: string; // YYYY-MM-DD
     startTime: string; // "19:45"
@@ -123,39 +124,6 @@ export interface HabitGoal {
   notes?: string;
 }
 
-export interface AvailableTimeSlot {
-  startTime: string; // "10:00"
-  endTime: string;   // "11:00"
-  durationMinutes: number;
-  context: 'college_gap' | 'after_college' | 'evening_post_gym' | 'weekend';
-}
-
-export interface AIRecommendation {
-  id: string;
-  type: 'study' | 'revision' | 'manual' | 'assignment' | 'break' | 'entertainment';
-  title: string;
-  subjectCode?: string;
-  unitNumber?: number;
-  estimatedMinutes: number;
-  reason: string;
-  priorityScore: number;
-  deadlineWarning?: string;
-  taskId?: string;
-  unitId?: string;
-}
-
-export interface ScheduleConflict {
-  id: string;
-  timeRange: string;
-  conflictingItem: string;
-  blockedReason: string;
-  suggestion: string;
-  suggestedSlot?: {
-    startTime: string;
-    endTime: string;
-  };
-}
-
 export interface PostGymSlot {
   id: string;
   startTime: string; // "19:00"
@@ -163,7 +131,7 @@ export interface PostGymSlot {
   title: string;     // e.g. "Dinner & Post-Workout Nutrition"
   subtitle?: string; // "High-protein meal, hydration & mental reset"
   type: 'meal' | 'study' | 'manual' | 'assignment' | 'revision' | 'leisure' | 'wind_down' | 'custom';
-  subjectCode?: string; // "OSY", "CLC", "STE", "ENDS"
+  subjectCode?: string; // "OSY", "CLC", "STE"
   unitNumber?: number;
   taskId?: string;
   notes?: string;
@@ -182,16 +150,91 @@ export interface ChatMessage {
   }[];
 }
 
+// -------------------------------------------------------------
+// 1. MSBTE EXAM CALENDAR TYPES
+// -------------------------------------------------------------
+export interface MSBTECalendarEvent {
+  id: string;
+  title: string;
+  startDate: string; // YYYY-MM-DD
+  endDate?: string;   // YYYY-MM-DD
+  category: 'term' | 'class_test' | 'practical_exam' | 'theory_exam' | 'exam_form' | 'result';
+  description?: string;
+  reminderEnabled: boolean;
+  isTentative?: boolean;
+  fixed: true; // Official MSBTE fixed dates cannot be shifted by AI scheduler
+}
+
+// -------------------------------------------------------------
+// 2. 98% TARGET SYSTEM TYPES
+// -------------------------------------------------------------
+export interface AssessmentScore {
+  obtained: number;
+  max: number;
+}
+
+export interface SubjectMarksEntry {
+  ct1?: AssessmentScore;
+  ct2?: AssessmentScore;
+  assignments?: AssessmentScore;
+  practicals?: AssessmentScore;
+  theory?: AssessmentScore;
+}
+
+export interface AcademicPerformanceData {
+  targetPercentage: number; // strictly 98
+  scores: {
+    [subjectCode: string]: SubjectMarksEntry;
+  };
+  lastUpdated?: string;
+}
+
+// -------------------------------------------------------------
+// 3. SOUL ROAST & NOTIFICATION TYPES
+// -------------------------------------------------------------
+export type TaskSkipReason = 'emergency' | 'health' | 'college_work' | 'travel' | 'personal' | 'rest' | 'no_reason';
+
+export interface NotificationToggles {
+  upcomingExam: boolean;
+  ct1Reminder: boolean;
+  ct2Reminder: boolean;
+  practicalExamReminder: boolean;
+  theoryExamReminder: boolean;
+  assignmentDeadline: boolean;
+  manualDeadline: boolean;
+  revisionReminder: boolean;
+  missedTaskRoast: boolean;
+  postponedTaskRoast: boolean;
+  completedEncouragement: boolean;
+}
+
+export interface SoulRoastSettings {
+  enabled: boolean;
+  intensity: 'friendly' | 'savage' | 'maximum';
+  notifications: NotificationToggles;
+}
+
+export interface RoastItem {
+  id: string;
+  message: string;
+  type: 'missed_task' | 'postponed' | 'missed_assignment' | 'skipped_session' | 'completed_encouragement';
+  timestamp: string;
+  intensity: 'friendly' | 'savage' | 'maximum';
+  taskTitle?: string;
+}
+
 export interface UserPreferences {
   name: string;
   collegeName: string;
   semester: string;
+  batch: 'A' | 'B' | 'C' | 'D'; // Strictly Batch C for the student
   gymStartTime: string; // "16:00"
   gymEndTime: string;   // "19:00"
   enableNotifications: boolean;
   pomodoroWorkMinutes: number;
   pomodoroBreakMinutes: number;
   defaultRevisionIntervals: [number, number, number]; // [1, 7, 21]
+  roastSettings: SoulRoastSettings;
 }
 
 export interface EntertainmentOption {
@@ -204,5 +247,4 @@ export interface EntertainmentOption {
   description?: string;
   link?: string;
   tags?: string[];
-  recommendedWhenFreeMinutes?: number;
 }

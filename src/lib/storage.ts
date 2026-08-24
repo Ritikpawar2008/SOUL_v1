@@ -8,6 +8,11 @@ import {
   TimetableSlot,
   UserPreferences,
   PostGymSlot,
+  MSBTECalendarEvent,
+  AcademicPerformanceData,
+  SoulRoastSettings,
+  RoastItem,
+  SubjectMarksEntry,
 } from '../types';
 import {
   INITIAL_ACADEMIC_TASKS,
@@ -17,6 +22,9 @@ import {
   INITIAL_SUBJECTS,
   INITIAL_TIMETABLE,
   INITIAL_POST_GYM_ROUTINE,
+  INITIAL_MSBTE_CALENDAR,
+  INITIAL_ACADEMIC_PERFORMANCE,
+  INITIAL_ROAST_SETTINGS,
 } from '../data/initialData';
 import { triggerSupabaseSync, fetchStateFromSupabase, isSupabaseConfigured } from './supabase';
 
@@ -29,6 +37,10 @@ const STORAGE_KEYS = {
   FOCUS_SESSIONS: 'soul_focus_sessions_v5',
   HISTORY: 'soul_history_v5',
   POST_GYM_ROUTINE: 'soul_post_gym_routine_v5',
+  MSBTE_CALENDAR: 'soul_msbte_calendar_v5',
+  PERFORMANCE: 'soul_performance_v5',
+  ROAST_SETTINGS: 'soul_roast_settings_v5',
+  ROAST_LOG: 'soul_roast_log_v5',
 };
 
 export class StorageService {
@@ -143,9 +155,99 @@ export class StorageService {
     this.saveActivityHistory([item, ...existing]);
   }
 
+  // -------------------------------------------------------------
+  // MSBTE CALENDAR METHODS
+  // -------------------------------------------------------------
+  static getMsbteCalendar(): MSBTECalendarEvent[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.MSBTE_CALENDAR);
+      return data ? JSON.parse(data) : INITIAL_MSBTE_CALENDAR;
+    } catch {
+      return INITIAL_MSBTE_CALENDAR;
+    }
+  }
+
+  static saveMsbteCalendar(events: MSBTECalendarEvent[]): void {
+    localStorage.setItem(STORAGE_KEYS.MSBTE_CALENDAR, JSON.stringify(events));
+    this.pushCurrentStateToCloud();
+    window.dispatchEvent(new Event('soul_data_changed'));
+  }
+
+  static toggleMsbteReminder(eventId: string): MSBTECalendarEvent[] {
+    const calendar = this.getMsbteCalendar();
+    const updated = calendar.map(e =>
+      e.id === eventId ? { ...e, reminderEnabled: !e.reminderEnabled } : e
+    );
+    this.saveMsbteCalendar(updated);
+    return updated;
+  }
+
+  // -------------------------------------------------------------
+  // 98% TARGET & ACADEMIC PERFORMANCE METHODS
+  // -------------------------------------------------------------
+  static getAcademicPerformance(): AcademicPerformanceData {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.PERFORMANCE);
+      return data ? JSON.parse(data) : INITIAL_ACADEMIC_PERFORMANCE;
+    } catch {
+      return INITIAL_ACADEMIC_PERFORMANCE;
+    }
+  }
+
+  static saveAcademicPerformance(data: AcademicPerformanceData): void {
+    localStorage.setItem(STORAGE_KEYS.PERFORMANCE, JSON.stringify(data));
+    this.pushCurrentStateToCloud();
+    window.dispatchEvent(new Event('soul_data_changed'));
+  }
+
+  static saveSubjectMarks(subjectCode: string, marks: SubjectMarksEntry): void {
+    const current = this.getAcademicPerformance();
+    const updated: AcademicPerformanceData = {
+      ...current,
+      scores: {
+        ...current.scores,
+        [subjectCode]: marks,
+      },
+      lastUpdated: new Date().toISOString(),
+    };
+    this.saveAcademicPerformance(updated);
+  }
+
+  // -------------------------------------------------------------
+  // SOUL ROAST METHODS
+  // -------------------------------------------------------------
+  static getRoastSettings(): SoulRoastSettings {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.ROAST_SETTINGS);
+      return data ? JSON.parse(data) : INITIAL_ROAST_SETTINGS;
+    } catch {
+      return INITIAL_ROAST_SETTINGS;
+    }
+  }
+
+  static saveRoastSettings(settings: SoulRoastSettings): void {
+    localStorage.setItem(STORAGE_KEYS.ROAST_SETTINGS, JSON.stringify(settings));
+    this.pushCurrentStateToCloud();
+    window.dispatchEvent(new Event('soul_data_changed'));
+  }
+
+  static getRoastLog(): RoastItem[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.ROAST_LOG);
+      return data ? JSON.parse(data) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  static logRoast(roast: RoastItem): void {
+    const existing = this.getRoastLog();
+    localStorage.setItem(STORAGE_KEYS.ROAST_LOG, JSON.stringify([roast, ...existing.slice(0, 49)]));
+    window.dispatchEvent(new CustomEvent('soul_roast_triggered', { detail: roast }));
+  }
+
   /**
    * Updates unit progress based on actual study duration.
-   * If unit completes (100%), dynamically generates future spaced revision dates based on TODAY's completion date.
    */
   static logUnitStudySession(
     subjectCode: string,
@@ -272,6 +374,9 @@ export class StorageService {
         habits: this.getHabits(),
         history: this.getActivityHistory(),
         postGymRoutine: this.getPostGymRoutine(),
+        msbteCalendar: this.getMsbteCalendar(),
+        performance: this.getAcademicPerformance(),
+        roastSettings: this.getRoastSettings(),
       });
     } catch (e) {
       console.warn('Could not sync to Supabase:', e);
@@ -307,6 +412,15 @@ export class StorageService {
       if (Array.isArray(cloudData.postGymRoutine)) {
         localStorage.setItem(STORAGE_KEYS.POST_GYM_ROUTINE, JSON.stringify(cloudData.postGymRoutine));
       }
+      if (Array.isArray((cloudData as any).msbteCalendar)) {
+        localStorage.setItem(STORAGE_KEYS.MSBTE_CALENDAR, JSON.stringify((cloudData as any).msbteCalendar));
+      }
+      if ((cloudData as any).performance) {
+        localStorage.setItem(STORAGE_KEYS.PERFORMANCE, JSON.stringify((cloudData as any).performance));
+      }
+      if ((cloudData as any).roastSettings) {
+        localStorage.setItem(STORAGE_KEYS.ROAST_SETTINGS, JSON.stringify((cloudData as any).roastSettings));
+      }
 
       window.dispatchEvent(new Event('soul_data_changed'));
       return true;
@@ -317,7 +431,7 @@ export class StorageService {
   }
 
   /**
-   * Reset all data back to clean factory initial state
+   * Reset all data back to clean factory initial state (0% progress)
    */
   static resetToDefault(): void {
     localStorage.removeItem(STORAGE_KEYS.PREFERENCES);
@@ -328,6 +442,10 @@ export class StorageService {
     localStorage.removeItem(STORAGE_KEYS.FOCUS_SESSIONS);
     localStorage.removeItem(STORAGE_KEYS.HISTORY);
     localStorage.removeItem(STORAGE_KEYS.POST_GYM_ROUTINE);
+    localStorage.removeItem(STORAGE_KEYS.MSBTE_CALENDAR);
+    localStorage.removeItem(STORAGE_KEYS.PERFORMANCE);
+    localStorage.removeItem(STORAGE_KEYS.ROAST_SETTINGS);
+    localStorage.removeItem(STORAGE_KEYS.ROAST_LOG);
     this.pushCurrentStateToCloud();
     window.dispatchEvent(new Event('soul_data_changed'));
   }
@@ -345,6 +463,9 @@ export class StorageService {
       focusSessions: this.getFocusSessions(),
       history: this.getActivityHistory(),
       postGymRoutine: this.getPostGymRoutine(),
+      msbteCalendar: this.getMsbteCalendar(),
+      performance: this.getAcademicPerformance(),
+      roastSettings: this.getRoastSettings(),
       exportedAt: new Date().toISOString(),
     };
     return JSON.stringify(data, null, 2);
@@ -363,6 +484,9 @@ export class StorageService {
       if (parsed.preferences) localStorage.setItem(STORAGE_KEYS.PREFERENCES, JSON.stringify(parsed.preferences));
       if (parsed.history) localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(parsed.history));
       if (parsed.postGymRoutine) localStorage.setItem(STORAGE_KEYS.POST_GYM_ROUTINE, JSON.stringify(parsed.postGymRoutine));
+      if (parsed.msbteCalendar) localStorage.setItem(STORAGE_KEYS.MSBTE_CALENDAR, JSON.stringify(parsed.msbteCalendar));
+      if (parsed.performance) localStorage.setItem(STORAGE_KEYS.PERFORMANCE, JSON.stringify(parsed.performance));
+      if (parsed.roastSettings) localStorage.setItem(STORAGE_KEYS.ROAST_SETTINGS, JSON.stringify(parsed.roastSettings));
       this.pushCurrentStateToCloud();
       window.dispatchEvent(new Event('soul_data_changed'));
       return true;

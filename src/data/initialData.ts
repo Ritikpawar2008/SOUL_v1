@@ -7,21 +7,157 @@ import {
   UserPreferences,
   EntertainmentOption,
   ActivityHistoryItem,
-  PostGymSlot
+  PostGymSlot,
+  MSBTECalendarEvent,
+  AcademicPerformanceData,
+  SoulRoastSettings
 } from '../types';
+
+export const INITIAL_ROAST_SETTINGS: SoulRoastSettings = {
+  enabled: true,
+  intensity: 'savage',
+  notifications: {
+    upcomingExam: true,
+    ct1Reminder: true,
+    ct2Reminder: true,
+    practicalExamReminder: true,
+    theoryExamReminder: true,
+    assignmentDeadline: true,
+    manualDeadline: true,
+    revisionReminder: true,
+    missedTaskRoast: true,
+    postponedTaskRoast: true,
+    completedEncouragement: true,
+  },
+};
 
 export const INITIAL_PREFERENCES: UserPreferences = {
   name: 'Student',
   collegeName: "Vidyavardhini's Bhausaheb Vartak Polytechnic",
   semester: 'Time Table TYCO-2 (Room No: 10, Academic Year 2026-27)',
+  batch: 'C', // Strictly Batch C for the student
   gymStartTime: '16:00',
   gymEndTime: '19:00',
   enableNotifications: true,
   pomodoroWorkMinutes: 25,
   pomodoroBreakMinutes: 5,
   defaultRevisionIntervals: [1, 7, 21],
+  roastSettings: INITIAL_ROAST_SETTINGS,
 };
 
+// -------------------------------------------------------------
+// 1. OFFICIAL MSBTE ACADEMIC CALENDAR (A.Y. 2026-27 ODD SEMESTER)
+// -------------------------------------------------------------
+export const INITIAL_MSBTE_CALENDAR: MSBTECalendarEvent[] = [
+  {
+    id: 'msbte-term-odd',
+    title: 'Odd Semester Academic Term',
+    startDate: '2026-07-15',
+    endDate: '2026-10-30',
+    category: 'term',
+    description: 'Official academic instructional period for MSBTE Odd Semester 2026–27.',
+    reminderEnabled: true,
+    fixed: true,
+  },
+  {
+    id: 'msbte-form-normal',
+    title: 'Winter 2026 Exam Form Filling (Normal Fees)',
+    startDate: '2026-08-17',
+    endDate: '2026-08-31',
+    category: 'exam_form',
+    description: 'Submit Winter 2026 exam registration form without late fee penalty.',
+    reminderEnabled: true,
+    fixed: true,
+  },
+  {
+    id: 'msbte-form-late',
+    title: 'Winter 2026 Exam Form (Late Fee)',
+    startDate: '2026-09-02',
+    endDate: '2026-09-08',
+    category: 'exam_form',
+    description: 'Exam form submission with standard late fee penalty.',
+    reminderEnabled: true,
+    fixed: true,
+  },
+  {
+    id: 'msbte-form-super-late',
+    title: 'Winter 2026 Exam Form (Super Late Fee)',
+    startDate: '2026-09-10',
+    endDate: '2026-09-15',
+    category: 'exam_form',
+    description: 'Final extension window for exam form filling with super late fee.',
+    reminderEnabled: true,
+    fixed: true,
+  },
+  {
+    id: 'msbte-ct1',
+    title: 'First Class Test (CT-1)',
+    startDate: '2026-09-10',
+    endDate: '2026-09-11',
+    category: 'class_test',
+    description: 'First formal 25-mark internal assessment across CLC, OSY, and STE.',
+    reminderEnabled: true,
+    fixed: true,
+  },
+  {
+    id: 'msbte-ct2',
+    title: 'Second Class Test (CT-2)',
+    startDate: '2026-10-12',
+    endDate: '2026-10-14',
+    category: 'class_test',
+    description: 'Second formal 25-mark internal assessment covering remaining syllabus units.',
+    reminderEnabled: true,
+    fixed: true,
+  },
+  {
+    id: 'msbte-practical-exam',
+    title: 'MSBTE Practical Examination',
+    startDate: '2026-11-02',
+    endDate: '2026-11-06',
+    category: 'practical_exam',
+    description: 'External and internal laboratory oral/practical evaluations for OSY, CLC, and STE.',
+    reminderEnabled: true,
+    fixed: true,
+  },
+  {
+    id: 'msbte-theory-exam',
+    title: 'MSBTE Theory Examination (Winter 2026)',
+    startDate: '2026-11-17',
+    endDate: '2026-12-09',
+    category: 'theory_exam',
+    description: 'Final MSBTE board written examinations (70 marks per core subject).',
+    reminderEnabled: true,
+    fixed: true,
+  },
+  {
+    id: 'msbte-result',
+    title: 'MSBTE Winter 2026 Result Declaration',
+    startDate: '2027-01-08',
+    endDate: '2027-01-15',
+    category: 'result',
+    description: 'Official result announcement for Winter 2026 examination cycle (2nd week of January 2027 — Tentative).',
+    reminderEnabled: true,
+    isTentative: true,
+    fixed: true,
+  },
+];
+
+// -------------------------------------------------------------
+// 2. 98% TARGET SYSTEM INITIAL PERFORMANCE DATA
+// -------------------------------------------------------------
+export const INITIAL_ACADEMIC_PERFORMANCE: AcademicPerformanceData = {
+  targetPercentage: 98, // Strictly 98%
+  scores: {
+    CLC: {},
+    OSY: {},
+    STE: {},
+  },
+  lastUpdated: undefined,
+};
+
+// -------------------------------------------------------------
+// 3. FIXED TIMETABLE WITH BATCH C PRIORITY
+// -------------------------------------------------------------
 export const INITIAL_TIMETABLE: TimetableSlot[] = [
   // MONDAY (MON)
   {
@@ -81,9 +217,11 @@ export const INITIAL_TIMETABLE: TimetableSlot[] = [
     day: 'Tuesday',
     startTime: '11:00',
     endTime: '13:00',
-    title: 'Practical Lab (A: STE / B: OSY / C: CLC / D: STE)',
+    title: 'Practical Lab [Batch C: CLC (L-7)]',
     type: 'practical',
-    room: 'L-5 / L-4 / L-7 / L-3',
+    room: 'L-7 (Batch C)',
+    subjectCode: 'CLC',
+    instructor: 'NKD (Mrs. Nilakshi Deshmukh)',
     batchInfo: {
       batchA: { subject: 'STE', lab: 'L-5', faculty: 'SSK' },
       batchB: { subject: 'OSY', lab: 'L-4', faculty: 'MRV' },
@@ -110,17 +248,6 @@ export const INITIAL_TIMETABLE: TimetableSlot[] = [
     room: 'ROOM NO 5',
     instructor: 'MRV (Ms. Maitrayee Vartak)',
   },
-  {
-    id: 'tue-5',
-    day: 'Tuesday',
-    startTime: '14:30',
-    endTime: '15:30',
-    title: 'ENDS (TH)',
-    subjectCode: 'ENDS',
-    type: 'lecture',
-    room: 'ROOM NO 5',
-    instructor: 'VB (Ms. Vaishnavi Bhoir)',
-  },
 
   // WEDNESDAY (WED)
   {
@@ -128,11 +255,13 @@ export const INITIAL_TIMETABLE: TimetableSlot[] = [
     day: 'Wednesday',
     startTime: '09:00',
     endTime: '11:00',
-    title: 'Practical Lab (A: ENDS / B: STE / C: STE / D: OSY)',
+    title: 'Practical Lab [Batch C: STE (L-7)]',
     type: 'practical',
-    room: 'L-12 / L-5 / L-7 / L-4',
+    room: 'L-7 (Batch C)',
+    subjectCode: 'STE',
+    instructor: 'SSK (Mrs. Seema Kaimal)',
     batchInfo: {
-      batchA: { subject: 'ENDS', lab: 'L-12', faculty: 'VB' },
+      batchA: { subject: 'Lab A', lab: 'L-12', faculty: 'VB' },
       batchB: { subject: 'STE', lab: 'L-5', faculty: 'UVM' },
       batchC: { subject: 'STE', lab: 'L-7', faculty: 'SSK' },
       batchD: { subject: 'OSY', lab: 'L-4', faculty: 'MRV' },
@@ -162,14 +291,15 @@ export const INITIAL_TIMETABLE: TimetableSlot[] = [
     day: 'Wednesday',
     startTime: '13:30',
     endTime: '15:30',
-    title: 'Practical Lab (A: STE / B: CLC / C: ENDS / D: ENDS)',
+    title: 'Practical Lab [Batch C: STE/Lab Sprint (L-11)]',
     type: 'practical',
-    room: 'L-5 / L-7 / L-11 / L-10',
+    room: 'L-11 (Batch C)',
+    subjectCode: 'STE',
     batchInfo: {
       batchA: { subject: 'STE', lab: 'L-5', faculty: 'SSK' },
       batchB: { subject: 'CLC', lab: 'L-7', faculty: 'NKD' },
-      batchC: { subject: 'ENDS', lab: 'L-11', faculty: 'MV' },
-      batchD: { subject: 'ENDS', lab: 'L-10', faculty: 'SR' },
+      batchC: { subject: 'STE/Lab', lab: 'L-11', faculty: 'MV' },
+      batchD: { subject: 'Lab', lab: 'L-10', faculty: 'SR' },
     },
   },
 
@@ -179,9 +309,11 @@ export const INITIAL_TIMETABLE: TimetableSlot[] = [
     day: 'Thursday',
     startTime: '09:00',
     endTime: '11:00',
-    title: 'Practical Lab (A: CLC / B: STE / C: OSY / D: STE)',
+    title: 'Practical Lab [Batch C: OSY (L-4)]',
     type: 'practical',
-    room: 'L-7 / L-11 / L-4 / L-13',
+    room: 'L-4 (Batch C)',
+    subjectCode: 'OSY',
+    instructor: 'MRV (Ms. Maitrayee Vartak)',
     batchInfo: {
       batchA: { subject: 'CLC', lab: 'L-7', faculty: 'VB' },
       batchB: { subject: 'STE', lab: 'L-11', faculty: 'UVM' },
@@ -194,12 +326,14 @@ export const INITIAL_TIMETABLE: TimetableSlot[] = [
     day: 'Thursday',
     startTime: '11:00',
     endTime: '13:00',
-    title: 'Practical Lab (A: OSY / B: ENDS / C: STE / D: CLC)',
+    title: 'Practical Lab [Batch C: STE (L-5)]',
     type: 'practical',
-    room: 'L-4 / L-8 / L-5 / L-7',
+    room: 'L-5 (Batch C)',
+    subjectCode: 'STE',
+    instructor: 'SSK (Mrs. Seema Kaimal)',
     batchInfo: {
       batchA: { subject: 'OSY', lab: 'L-4', faculty: 'BSP' },
-      batchB: { subject: 'ENDS', lab: 'L-8', faculty: 'VB' },
+      batchB: { subject: 'Lab B', lab: 'L-8', faculty: 'VB' },
       batchC: { subject: 'STE', lab: 'L-5', faculty: 'SSK' },
       batchD: { subject: 'CLC', lab: 'L-7', faculty: 'NKD' },
     },
@@ -217,10 +351,10 @@ export const INITIAL_TIMETABLE: TimetableSlot[] = [
     day: 'Thursday',
     startTime: '13:30',
     endTime: '15:30',
-    title: 'A-SPI | B-SPI | C-SPI | D-SPI (Capstone Project Lab)',
+    title: 'C-SPI (Capstone Project Lab Batch C)',
     subjectCode: 'SPI',
     type: 'practical',
-    room: 'Project Labs',
+    room: 'Project Labs (Batch C)',
   },
 
   // FRIDAY (FRI)
@@ -287,6 +421,9 @@ export const INITIAL_TIMETABLE: TimetableSlot[] = [
   },
 ];
 
+// -------------------------------------------------------------
+// 4. CORE ACADEMIC SUBJECTS (CLC, OSY, STE)
+// -------------------------------------------------------------
 export const INITIAL_SUBJECTS: Subject[] = [
   {
     id: 'subj-clc',
@@ -559,94 +696,13 @@ export const INITIAL_SUBJECTS: Subject[] = [
       },
     ],
   },
-  {
-    id: 'subj-ends',
-    code: 'ENDS',
-    name: 'Entrepreneurship Development & Emerging Trends',
-    faculty: 'VB (Ms. Vaishnavi Bhoir)',
-    color: '#8b5cf6', // Violet
-    units: [
-      {
-        id: 'ends-u1',
-        unitNumber: 1,
-        title: 'Entrepreneurship & Startup Fundamentals',
-        subjectCode: 'ENDS',
-        status: 'not_started',
-        progress: 0,
-        totalMinutesStudied: 0,
-        estimatedMinutes: 100,
-        revisions: [
-          { stage: 1, status: 'pending', intervalDays: 1 },
-          { stage: 2, status: 'pending', intervalDays: 7 },
-          { stage: 3, status: 'pending', intervalDays: 21 },
-        ],
-      },
-      {
-        id: 'ends-u2',
-        unitNumber: 2,
-        title: 'Business Opportunity Identification & Market Research',
-        subjectCode: 'ENDS',
-        status: 'not_started',
-        progress: 0,
-        totalMinutesStudied: 0,
-        estimatedMinutes: 110,
-        revisions: [
-          { stage: 1, status: 'pending', intervalDays: 1 },
-          { stage: 2, status: 'pending', intervalDays: 7 },
-          { stage: 3, status: 'pending', intervalDays: 21 },
-        ],
-      },
-      {
-        id: 'ends-u3',
-        unitNumber: 3,
-        title: 'Business Plan Preparation & Project Report',
-        subjectCode: 'ENDS',
-        status: 'not_started',
-        progress: 0,
-        totalMinutesStudied: 0,
-        estimatedMinutes: 120,
-        revisions: [
-          { stage: 1, status: 'pending', intervalDays: 1 },
-          { stage: 2, status: 'pending', intervalDays: 7 },
-          { stage: 3, status: 'pending', intervalDays: 21 },
-        ],
-      },
-      {
-        id: 'ends-u4',
-        unitNumber: 4,
-        title: 'Financial Planning, Institutional Support & Legalities',
-        subjectCode: 'ENDS',
-        status: 'not_started',
-        progress: 0,
-        totalMinutesStudied: 0,
-        estimatedMinutes: 100,
-        revisions: [
-          { stage: 1, status: 'pending', intervalDays: 1 },
-          { stage: 2, status: 'pending', intervalDays: 7 },
-          { stage: 3, status: 'pending', intervalDays: 21 },
-        ],
-      },
-      {
-        id: 'ends-u5',
-        unitNumber: 5,
-        title: 'Emerging Network Technologies & Enterprise Scaling',
-        subjectCode: 'ENDS',
-        status: 'not_started',
-        progress: 0,
-        totalMinutesStudied: 0,
-        estimatedMinutes: 90,
-        revisions: [
-          { stage: 1, status: 'pending', intervalDays: 1 },
-          { stage: 2, status: 'pending', intervalDays: 7 },
-          { stage: 3, status: 'pending', intervalDays: 21 },
-        ],
-      },
-    ],
-  },
 ];
 
+// -------------------------------------------------------------
+// 5. INITIAL ACADEMIC TASKS (MANUALS & ASSIGNMENTS)
+// -------------------------------------------------------------
 export const INITIAL_ACADEMIC_TASKS: AcademicTask[] = [
-  // 1. MANUALS (OSY, CLC, STE, ENDS) — Initialized clean at 0%
+  // 1. MANUALS (OSY, CLC, STE)
   {
     id: 'man-osy',
     type: 'manual',
@@ -689,22 +745,8 @@ export const INITIAL_ACADEMIC_TASKS: AcademicTask[] = [
     actualMinutesSpent: 0,
     createdAt: '2026-08-24',
   },
-  {
-    id: 'man-ends',
-    type: 'manual',
-    subjectCode: 'ENDS',
-    title: 'ENDS Manual',
-    description: 'Entrepreneurship Development case studies and practical report submissions.',
-    deadline: '2026-08-31',
-    priority: 'high',
-    status: 'not_started',
-    progress: 0,
-    estimatedMinutes: 45,
-    actualMinutesSpent: 0,
-    createdAt: '2026-08-24',
-  },
 
-  // 2. ASSIGNMENTS — Initialized clean at 0%
+  // 2. ASSIGNMENTS
   {
     id: 'asg-osy',
     type: 'assignment',
@@ -744,20 +786,6 @@ export const INITIAL_ACADEMIC_TASKS: AcademicTask[] = [
     status: 'not_started',
     progress: 0,
     estimatedMinutes: 50,
-    actualMinutesSpent: 0,
-    createdAt: '2026-08-24',
-  },
-  {
-    id: 'asg-ends',
-    type: 'assignment',
-    subjectCode: 'ENDS',
-    title: 'Assignment',
-    description: 'Business model canvas and startup market feasibility study.',
-    deadline: '2026-09-04',
-    priority: 'medium',
-    status: 'not_started',
-    progress: 0,
-    estimatedMinutes: 45,
     actualMinutesSpent: 0,
     createdAt: '2026-08-24',
   },
@@ -911,7 +939,7 @@ export const INITIAL_POST_GYM_ROUTINE: PostGymSlot[] = [
     id: 'pg-5',
     startTime: '22:00',
     endTime: '22:45',
-    title: 'STE / ENDS Spaced Revision',
+    title: 'STE Spaced Revision',
     subtitle: 'Stage 1 active recall & key definitions revision',
     type: 'revision',
     subjectCode: 'STE',

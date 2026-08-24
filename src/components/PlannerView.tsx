@@ -302,7 +302,7 @@ export const PlannerView: React.FC<PlannerViewProps> = ({
                     <div className="grid grid-cols-4 gap-0 text-[11px] border border-black divide-x divide-black bg-white">
                       <div className={`p-1 ${selectedBatch === 'A' ? 'bg-cyan-100 font-bold' : ''}`}>
                         <div className="font-bold">A-PR</div>
-                        <div>ENDS</div>
+                        <div>STE</div>
                         <div>L-12</div>
                         <div className="font-bold">VB</div>
                       </div>
@@ -426,7 +426,7 @@ export const PlannerView: React.FC<PlannerViewProps> = ({
                       </div>
                       <div className={`p-1 ${selectedBatch === 'B' ? 'bg-cyan-100 font-bold' : ''}`}>
                         <div className="font-bold">B-PR</div>
-                        <div>ENDS</div>
+                        <div>LAB</div>
                         <div>L-8</div>
                         <div className="font-bold">VB</div>
                       </div>
@@ -479,7 +479,7 @@ export const PlannerView: React.FC<PlannerViewProps> = ({
                     </div>
                   </td>
 
-                  {/* TUE 01:30 - 03:30 (01:30-02:30 OSY (TH) and 02:30-03:30 ENDS (TH)) */}
+                  {/* TUE 01:30 - 03:30 (01:30-02:30 OSY (TH) and 02:30-03:30 TH) */}
                   <td className="border-r-2 border-black p-1 align-top">
                     <div className="p-2 border-b-2 border-black">
                       <div className="font-bold text-sm">OSY (TH)</div>
@@ -487,7 +487,7 @@ export const PlannerView: React.FC<PlannerViewProps> = ({
                       <div className="text-xs font-bold">MRV</div>
                     </div>
                     <div className="p-2">
-                      <div className="font-bold text-sm">ENDS (TH)</div>
+                      <div className="font-bold text-sm">SELF STUDY</div>
                       <div className="text-xs">ROOM NO 5</div>
                       <div className="text-xs font-bold">VB</div>
                     </div>
@@ -510,13 +510,13 @@ export const PlannerView: React.FC<PlannerViewProps> = ({
                       </div>
                       <div className={`p-1 ${selectedBatch === 'C' ? 'bg-cyan-100 font-bold' : ''}`}>
                         <div className="font-bold">C-PR</div>
-                        <div>ENDS</div>
+                        <div>LAB</div>
                         <div>L-11</div>
                         <div className="font-bold">MV</div>
                       </div>
                       <div className={`p-1 ${selectedBatch === 'D' ? 'bg-cyan-100 font-bold' : ''}`}>
                         <div className="font-bold">D-PR</div>
-                        <div>ENDS</div>
+                        <div>LAB</div>
                         <div>L-10</div>
                         <div className="font-bold">SR</div>
                       </div>
@@ -921,7 +921,7 @@ export const PlannerView: React.FC<PlannerViewProps> = ({
                   <label className="text-white/70 block mb-1 font-semibold">Subject Code</label>
                   <input
                     type="text"
-                    placeholder="OSY, CLC, STE, ENDS"
+                    placeholder="OSY, CLC, STE"
                     value={formSubjectCode}
                     onChange={(e) => setFormSubjectCode(e.target.value.toUpperCase())}
                     className="w-full px-3 py-2 bg-black border border-white/20 text-white focus:outline-none focus:border-cyan-400"

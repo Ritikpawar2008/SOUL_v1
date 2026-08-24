@@ -204,7 +204,7 @@ export const PostGymRoutineSection: React.FC<PostGymRoutineSectionProps> = ({
           id: 'pg-5',
           startTime: '22:00',
           endTime: '22:45',
-          title: 'STE / ENDS Spaced Revision',
+          title: 'STE Spaced Revision',
           subtitle: 'Stage 1 active recall & key definitions revision',
           type: 'revision',
           subjectCode: 'STE',
@@ -452,7 +452,7 @@ export const PostGymRoutineSection: React.FC<PostGymRoutineSectionProps> = ({
 
             <div className="space-y-4 text-xs font-mono">
               <p className="text-white/70">
-                SOUL AI will analyze your pending academic manuals (OSY, CLC, STE, ENDS), upcoming assignment deadlines, and spaced revisions to generate a perfectly sequenced post-gym schedule starting at <strong className="text-orange-400">{preferences.gymEndTime || '07:00 PM'}</strong>.
+                SOUL AI will analyze your pending academic manuals (OSY, CLC, STE), upcoming assignment deadlines, and spaced revisions to generate a perfectly sequenced post-gym schedule starting at <strong className="text-orange-400">{preferences.gymEndTime || '07:00 PM'}</strong>.
               </p>
 
               {/* Strategy Selector */}
@@ -615,8 +615,8 @@ export const PostGymRoutineSection: React.FC<PostGymRoutineSectionProps> = ({
                     <label className="text-white/60 uppercase text-[10px] font-bold tracking-wider">Subject</label>
                     <span className="text-[10px] text-cyan-400 font-bold">{formSubjectCode}</span>
                   </div>
-                  <div className="grid grid-cols-4 gap-1.5">
-                    {['OSY', 'CLC', 'STE', 'ENDS'].map(code => (
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {['OSY', 'CLC', 'STE'].map(code => (
                       <button
                         key={code}
                         type="button"

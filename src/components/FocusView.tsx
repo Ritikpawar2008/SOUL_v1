@@ -446,25 +446,59 @@ export const FocusView: React.FC<FocusViewProps> = ({
             </div>
           </div>
 
-          {/* Quick Sprint Presets */}
-          <div className="p-6 bg-[#0C1214] border border-white/10 space-y-3">
-            <h4 className="text-[10px] font-mono uppercase tracking-[0.2em] font-black text-white/50">
-              SPRINT DURATION PRESETS
-            </h4>
-            <div className="grid grid-cols-2 gap-2">
-              {[15, 25, 45, 60, 90, 120].map(mins => (
+          {/* Quick Sprint Presets & Custom Duration Input */}
+          <div className="p-6 bg-[#0C1214] border border-white/10 space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="text-[10px] font-mono uppercase tracking-[0.2em] font-black text-white/50">
+                SPRINT DURATION
+              </h4>
+              <span className="text-cyan-400 font-mono text-xs font-bold">{targetMinutes} MINS</span>
+            </div>
+
+            {/* Quick Presets */}
+            <div className="grid grid-cols-3 gap-2">
+              {[15, 25, 30, 45, 60, 90].map(mins => (
                 <button
                   key={mins}
                   onClick={() => selectCustomMinutes(mins)}
-                  className={`p-3 border font-mono text-xs font-black uppercase tracking-wider transition cursor-pointer ${
+                  className={`p-2.5 border font-mono text-xs font-black uppercase tracking-wider transition cursor-pointer ${
                     timerMode === 'custom' && targetMinutes === mins
                       ? 'bg-cyan-400 text-black border-cyan-400'
                       : 'bg-white/5 text-white/60 hover:text-white border-white/10'
                   }`}
                 >
-                  {mins} MINS
+                  {mins}M
                 </button>
               ))}
+            </div>
+
+            {/* Custom Exact Minute Input */}
+            <div className="pt-2 border-t border-white/10 space-y-2">
+              <label className="text-[10px] font-mono text-white/40 uppercase block font-bold">
+                Set Exact Custom Minutes:
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min="1"
+                  max="480"
+                  value={targetMinutes}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value, 10);
+                    if (!isNaN(val) && val > 0) {
+                      selectCustomMinutes(val);
+                    }
+                  }}
+                  className="flex-1 px-3 py-2 bg-white/5 border border-white/15 text-white font-mono text-xs focus:outline-none focus:border-cyan-400"
+                  placeholder="Minutes e.g. 50"
+                />
+                <button
+                  onClick={() => selectCustomMinutes(targetMinutes)}
+                  className="px-4 py-2 bg-white/10 hover:bg-cyan-400 hover:text-black text-white font-mono font-bold text-xs uppercase tracking-wider transition cursor-pointer"
+                >
+                  SET
+                </button>
+              </div>
             </div>
           </div>
 

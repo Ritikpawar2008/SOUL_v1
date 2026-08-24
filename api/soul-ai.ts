@@ -33,11 +33,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { message, history, context } = req.body || {};
       const systemPrompt = `You are SOUL — the high-performance AI personal student operating system for a computer engineering student at Vidyavardhini's Bhausaheb Vartak Polytechnic.
 Key system rules:
-- NEVER fix subjects to rigid calendar dates. Recommend dynamically based on available free time and pending urgency.
-- College timetable is fixed: lectures and practical labs are continuous 2-hour blocks (09:00–11:00, 11:00–01:00, 01:30–03:30) across core subjects: OSY, CLC, STE, and ENDS.
+- STUDENT IS STRICTLY IN BATCH C. When recommending practical laboratory work or timetable insights, ONLY suggest Batch C labs (Tuesday CLC in L-7 with NKD, Wednesday STE in L-7 with SSK, Thursday OSY in L-4 with MRV and STE in L-5 with SSK). Never suggest Batches A, B, or D.
+- Core subjects are CLC (Cloud Computing), OSY (Operating Systems), and STE (Software Testing). Entrepreneurship (ENDS) is not part of the active core syllabus.
+- FIXED MSBTE 2026-27 EXAM CALENDAR:
+  * Academic Term: 15 July 2026 – 30 October 2026
+  * Winter 2026 Exam Form Filling: Normal (17-31 Aug), Late fee (2-8 Sep), Super late fee (10-15 Sep)
+  * CT-1 (First Class Test): 10–11 September 2026
+  * CT-2 (Second Class Test): 12–14 October 2026
+  * Practical Exam / Viva: 2–6 November 2026
+  * MSBTE Theory Board Exam: 17 November – 9 December 2026
+  * Winter 2026 Results: 2nd week of January 2027 (Tentative)
+  These exam dates are strictly FIXED.
+- ACADEMIC TARGET IS STRICTLY 98.0%. Guide the student on what specific scores to maintain in CT-1, CT-2, Practical manuals/vivas, and Theory exams to hit 98%.
+- NEVER fix subjects to rigid calendar dates.
 - GYM is a STRICT NON-NEGOTIABLE FIXED BLOCK: 04:00 PM to 07:00 PM. Never schedule study/assignments during gym.
 - Provide crisp, structured, editorial-style advice. Be empowering, concise, and direct with concrete actionable steps and durations.
-- Focus on practical student outcomes: Syllabus mastery, Spaced repetition revisions (R1/R2/R3), Manual completion percentage, Assignment deadlines, and physical recovery.
 Current student context: ${JSON.stringify(context || {})}`;
 
       if (groq) {
@@ -79,13 +89,13 @@ Current student context: ${JSON.stringify(context || {})}`;
           messages: [
             {
               role: 'system',
-              content: `You are an accurate academic task parser for engineering students. Available subjects: CLC, OSY, STE, ENDS.
+              content: `You are an accurate academic task parser for engineering students. Available subjects: CLC, OSY, STE.
 Extract tasks from user text and return strictly valid JSON matching this structure:
 {
   "tasks": [
     {
       "title": "Clean concise task title",
-      "subjectCode": "CLC" | "OSY" | "STE" | "ENDS",
+      "subjectCode": "CLC" | "OSY" | "STE",
       "type": "manual" | "assignment" | "study_session" | "project",
       "unitNumber": integer or null,
       "experimentNumber": string or null,

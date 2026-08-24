@@ -366,20 +366,34 @@ ON CONFLICT (id) DO NOTHING;`;
           </div>
         </div>
 
-        {/* 3. Core Profile & Constraints */}
+        {/* 3. Core Profile, Batch & Constraints */}
         <form onSubmit={handleSave} className="space-y-4 text-xs font-mono">
           <h4 className="text-xs font-mono font-black text-cyan-400 uppercase tracking-[0.2em]">
-            02 / COLLEGE & FIXED CONSTRAINTS
+            02 / COLLEGE, BATCH & FIXED CONSTRAINTS
           </h4>
 
-          <div>
-            <label className="text-white/50 block mb-1 uppercase font-bold">College / Polytechnic Name</label>
-            <input
-              type="text"
-              value={collegeName}
-              onChange={(e) => setCollegeName(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-cyan-400 font-sans"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-white/50 block mb-1 uppercase font-bold">College / Polytechnic Name</label>
+              <input
+                type="text"
+                value={collegeName}
+                onChange={(e) => setCollegeName(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-cyan-400 font-sans"
+              />
+            </div>
+
+            <div>
+              <label className="text-white/50 block mb-1 uppercase font-bold">Student Practical Batch</label>
+              <div className="flex items-center gap-2">
+                <span className="px-4 py-2.5 bg-cyan-400 text-black font-black text-xs uppercase tracking-wider">
+                  BATCH C ONLY
+                </span>
+                <span className="text-[10px] text-white/50 font-mono">
+                  (Batches A, B & D excluded from timetable recommendations)
+                </span>
+              </div>
+            </div>
           </div>
 
           <div>
@@ -411,6 +425,109 @@ ON CONFLICT (id) DO NOTHING;`;
                 onChange={(e) => setGymEndTime(e.target.value)}
                 className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-orange-400 font-mono"
               />
+            </div>
+          </div>
+
+          {/* SOUL ROAST & NOTIFICATION TOGGLES */}
+          <div className="p-4 bg-rose-500/10 border border-rose-500/30 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-rose-400 font-black tracking-wider uppercase">
+                <Flame className="w-4 h-4 text-orange-400" />
+                <span>SOUL ROAST & ACCOUNTABILITY ENGINE</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const updated = {
+                    ...preferences,
+                    roastSettings: {
+                      ...preferences.roastSettings,
+                      enabled: !preferences.roastSettings?.enabled,
+                    },
+                  };
+                  onSavePreferences(updated);
+                }}
+                className={`px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${
+                  preferences.roastSettings?.enabled ? 'bg-rose-500 text-black' : 'bg-white/10 text-white/50'
+                }`}
+              >
+                {preferences.roastSettings?.enabled ? 'ROAST ON' : 'ROAST OFF'}
+              </button>
+            </div>
+
+            {/* Intensity Selector */}
+            <div className="space-y-1.5 pt-1">
+              <label className="text-[10px] text-white/50 uppercase font-bold">Roast Intensity:</label>
+              <div className="grid grid-cols-3 gap-2">
+                {(['friendly', 'savage', 'maximum'] as const).map(lvl => (
+                  <button
+                    key={lvl}
+                    type="button"
+                    onClick={() => {
+                      const updated = {
+                        ...preferences,
+                        roastSettings: {
+                          ...preferences.roastSettings,
+                          intensity: lvl,
+                        },
+                      };
+                      onSavePreferences(updated);
+                    }}
+                    className={`py-1.5 text-[10px] font-mono font-black uppercase tracking-wider border ${
+                      preferences.roastSettings?.intensity === lvl
+                        ? 'bg-orange-500 text-black border-orange-500'
+                        : 'bg-white/5 text-white/60 border-white/10'
+                    }`}
+                  >
+                    {lvl}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Granular Notification Toggles */}
+            <div className="pt-2 border-t border-rose-500/20 space-y-1.5">
+              <div className="text-[10px] text-white/50 uppercase font-bold">Notification Triggers:</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-white/80">
+                {[
+                  { key: 'upcomingExam', label: 'Upcoming Exam Alert' },
+                  { key: 'ct1Reminder', label: 'CT-1 Reminder' },
+                  { key: 'ct2Reminder', label: 'CT-2 Reminder' },
+                  { key: 'practicalExamReminder', label: 'Practical Exam Reminder' },
+                  { key: 'theoryExamReminder', label: 'Theory Exam Reminder' },
+                  { key: 'assignmentDeadline', label: 'Assignment Deadline' },
+                  { key: 'manualDeadline', label: 'Manual Submission Deadline' },
+                  { key: 'revisionReminder', label: 'Spaced Revision Reminder' },
+                  { key: 'missedTaskRoast', label: 'Missed Task Roast' },
+                  { key: 'postponedTaskRoast', label: 'Postponed Task Roast' },
+                  { key: 'completedEncouragement', label: 'Completed Encouragement' },
+                ].map(item => {
+                  const currentVal = preferences.roastSettings?.notifications?.[item.key as keyof typeof preferences.roastSettings.notifications] ?? true;
+                  return (
+                    <label key={item.key} className="flex items-center gap-2 cursor-pointer p-1 bg-white/5 hover:bg-white/10">
+                      <input
+                        type="checkbox"
+                        checked={currentVal}
+                        onChange={() => {
+                          const updated = {
+                            ...preferences,
+                            roastSettings: {
+                              ...preferences.roastSettings,
+                              notifications: {
+                                ...preferences.roastSettings.notifications,
+                                [item.key]: !currentVal,
+                              },
+                            },
+                          };
+                          onSavePreferences(updated);
+                        }}
+                        className="w-3.5 h-3.5 accent-rose-500 rounded"
+                      />
+                      <span className="truncate">{item.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
