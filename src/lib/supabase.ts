@@ -120,6 +120,16 @@ export function triggerSupabaseSync(state: {
   msbteCalendar?: any;
   performance?: any;
   roastSettings?: any;
+  masterGoals?: any;
+  weeklyTargets?: any;
+  dailyRoutine?: any;
+  technicalTopics?: any;
+  weeklyProjects?: any;
+  skillOfTheWeek?: any;
+  learningGames?: any;
+  communicationActivities?: any;
+  confidenceChallenges?: any;
+  dailyReviews?: any;
 }) {
   if (!isSupabaseConfigured()) return;
 

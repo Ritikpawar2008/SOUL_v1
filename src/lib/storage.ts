@@ -13,6 +13,17 @@ import {
   SoulRoastSettings,
   RoastItem,
   SubjectMarksEntry,
+  MasterGoal,
+  WeeklyTarget,
+  DailyRoutineConfig,
+  TechnicalTopic,
+  WeeklyProject,
+  SkillOfTheWeek,
+  LearningGame,
+  CommunicationActivity,
+  ConfidenceChallenge,
+  DailyReviewEntry,
+  WeeklyReviewData,
 } from '../types';
 import {
   INITIAL_ACADEMIC_TASKS,
@@ -26,6 +37,17 @@ import {
   INITIAL_ACADEMIC_PERFORMANCE,
   INITIAL_ROAST_SETTINGS,
 } from '../data/initialData';
+import {
+  INITIAL_MASTER_GOALS,
+  INITIAL_WEEKLY_TARGETS,
+  INITIAL_DAILY_ROUTINE,
+  INITIAL_TECHNICAL_TOPICS,
+  INITIAL_WEEKLY_PROJECTS,
+  INITIAL_SKILL_OF_THE_WEEK,
+  INITIAL_LEARNING_GAMES,
+  INITIAL_COMMUNICATION_ACTIVITIES,
+  INITIAL_CONFIDENCE_CHALLENGES,
+} from '../data/growthInitialData';
 import { triggerSupabaseSync, fetchStateFromSupabase, isSupabaseConfigured } from './supabase';
 
 const STORAGE_KEYS = {
@@ -41,6 +63,17 @@ const STORAGE_KEYS = {
   PERFORMANCE: 'soul_performance_v5',
   ROAST_SETTINGS: 'soul_roast_settings_v5',
   ROAST_LOG: 'soul_roast_log_v5',
+  MASTER_GOALS: 'soul_master_goals_v5',
+  WEEKLY_TARGETS: 'soul_weekly_targets_v5',
+  DAILY_ROUTINE: 'soul_daily_routine_v5',
+  TECHNICAL_TOPICS: 'soul_technical_topics_v5',
+  WEEKLY_PROJECTS: 'soul_weekly_projects_v5',
+  SKILL_OF_THE_WEEK: 'soul_skill_of_the_week_v5',
+  LEARNING_GAMES: 'soul_learning_games_v5',
+  COMMUNICATION_ACTIVITIES: 'soul_communication_activities_v5',
+  CONFIDENCE_CHALLENGES: 'soul_confidence_challenges_v5',
+  DAILY_REVIEWS: 'soul_daily_reviews_v5',
+  WEEKLY_REVIEWS: 'soul_weekly_reviews_v5',
 };
 
 export class StorageService {
@@ -384,6 +417,275 @@ export class StorageService {
     return updated;
   }
 
+  // -------------------------------------------------------------
+  // MASTER GOALS (MY TARGETS) METHODS
+  // -------------------------------------------------------------
+  static getMasterGoals(): MasterGoal[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.MASTER_GOALS);
+      return data ? JSON.parse(data) : INITIAL_MASTER_GOALS;
+    } catch {
+      return INITIAL_MASTER_GOALS;
+    }
+  }
+
+  static saveMasterGoals(goals: MasterGoal[]): void {
+    localStorage.setItem(STORAGE_KEYS.MASTER_GOALS, JSON.stringify(goals));
+    this.pushCurrentStateToCloud();
+    window.dispatchEvent(new Event('soul_data_changed'));
+  }
+
+  static addMasterGoal(goal: MasterGoal): void {
+    const existing = this.getMasterGoals();
+    this.saveMasterGoals([goal, ...existing]);
+  }
+
+  static updateMasterGoal(goal: MasterGoal): void {
+    const existing = this.getMasterGoals();
+    this.saveMasterGoals(existing.map(g => g.id === goal.id ? goal : g));
+  }
+
+  static deleteMasterGoal(goalId: string): void {
+    const existing = this.getMasterGoals();
+    this.saveMasterGoals(existing.filter(g => g.id !== goalId));
+  }
+
+  // -------------------------------------------------------------
+  // WEEKLY TARGETS METHODS
+  // -------------------------------------------------------------
+  static getWeeklyTargets(): WeeklyTarget[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.WEEKLY_TARGETS);
+      return data ? JSON.parse(data) : INITIAL_WEEKLY_TARGETS;
+    } catch {
+      return INITIAL_WEEKLY_TARGETS;
+    }
+  }
+
+  static saveWeeklyTargets(targets: WeeklyTarget[]): void {
+    localStorage.setItem(STORAGE_KEYS.WEEKLY_TARGETS, JSON.stringify(targets));
+    this.pushCurrentStateToCloud();
+    window.dispatchEvent(new Event('soul_data_changed'));
+  }
+
+  static updateWeeklyTargetProgress(id: string, delta: number): void {
+    const targets = this.getWeeklyTargets();
+    const updated = targets.map(t => {
+      if (t.id === id) {
+        const next = Math.max(0, t.currentCount + delta);
+        return { ...t, currentCount: next };
+      }
+      return t;
+    });
+    this.saveWeeklyTargets(updated);
+  }
+
+  // -------------------------------------------------------------
+  // DAILY ROUTINE (MY ROUTINE) METHODS
+  // -------------------------------------------------------------
+  static getDailyRoutine(): DailyRoutineConfig {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.DAILY_ROUTINE);
+      if (!data) return INITIAL_DAILY_ROUTINE;
+      return { ...INITIAL_DAILY_ROUTINE, ...JSON.parse(data) };
+    } catch {
+      return INITIAL_DAILY_ROUTINE;
+    }
+  }
+
+  static saveDailyRoutine(routine: DailyRoutineConfig): void {
+    localStorage.setItem(STORAGE_KEYS.DAILY_ROUTINE, JSON.stringify(routine));
+    this.pushCurrentStateToCloud();
+    window.dispatchEvent(new Event('soul_data_changed'));
+  }
+
+  // -------------------------------------------------------------
+  // TECHNICAL BEAST & LINUX ROADMAP METHODS
+  // -------------------------------------------------------------
+  static getTechnicalTopics(): TechnicalTopic[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.TECHNICAL_TOPICS);
+      return data ? JSON.parse(data) : INITIAL_TECHNICAL_TOPICS;
+    } catch {
+      return INITIAL_TECHNICAL_TOPICS;
+    }
+  }
+
+  static saveTechnicalTopics(topics: TechnicalTopic[]): void {
+    localStorage.setItem(STORAGE_KEYS.TECHNICAL_TOPICS, JSON.stringify(topics));
+    this.pushCurrentStateToCloud();
+    window.dispatchEvent(new Event('soul_data_changed'));
+  }
+
+  static updateTechnicalTopicStatus(id: string, status: TechnicalTopic['status'], userExplanation?: string): void {
+    const topics = this.getTechnicalTopics();
+    const updated = topics.map(t => {
+      if (t.id === id) {
+        return {
+          ...t,
+          status,
+          userExplanation: userExplanation !== undefined ? userExplanation : t.userExplanation,
+          completedAt: status === 'completed' ? new Date().toISOString() : t.completedAt,
+        };
+      }
+      return t;
+    });
+    this.saveTechnicalTopics(updated);
+  }
+
+  // -------------------------------------------------------------
+  // WEEKLY PROJECTS (BUILD EVERY WEEK) METHODS
+  // -------------------------------------------------------------
+  static getWeeklyProjects(): WeeklyProject[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.WEEKLY_PROJECTS);
+      return data ? JSON.parse(data) : INITIAL_WEEKLY_PROJECTS;
+    } catch {
+      return INITIAL_WEEKLY_PROJECTS;
+    }
+  }
+
+  static saveWeeklyProjects(projects: WeeklyProject[]): void {
+    localStorage.setItem(STORAGE_KEYS.WEEKLY_PROJECTS, JSON.stringify(projects));
+    this.pushCurrentStateToCloud();
+    window.dispatchEvent(new Event('soul_data_changed'));
+  }
+
+  static toggleProjectStep(projectId: string, stepId: string): void {
+    const projects = this.getWeeklyProjects();
+    const updated = projects.map(p => {
+      if (p.id === projectId) {
+        const updatedSteps = p.steps.map(s => s.id === stepId ? { ...s, completed: !s.completed } : s);
+        const completedCount = updatedSteps.filter(s => s.completed).length;
+        const progress = Math.round((completedCount / (updatedSteps.length || 1)) * 100);
+        const isDone = progress >= 100;
+        return {
+          ...p,
+          steps: updatedSteps,
+          progress,
+          status: isDone ? ('deployed' as const) : p.status === 'deployed' ? ('in_progress' as const) : p.status,
+        };
+      }
+      return p;
+    });
+    this.saveWeeklyProjects(updated);
+  }
+
+  // -------------------------------------------------------------
+  // SKILL OF THE WEEK & LEARNING GAMES METHODS
+  // -------------------------------------------------------------
+  static getSkillOfTheWeek(): SkillOfTheWeek {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.SKILL_OF_THE_WEEK);
+      return data ? JSON.parse(data) : INITIAL_SKILL_OF_THE_WEEK;
+    } catch {
+      return INITIAL_SKILL_OF_THE_WEEK;
+    }
+  }
+
+  static saveSkillOfTheWeek(skill: SkillOfTheWeek): void {
+    localStorage.setItem(STORAGE_KEYS.SKILL_OF_THE_WEEK, JSON.stringify(skill));
+    this.pushCurrentStateToCloud();
+    window.dispatchEvent(new Event('soul_data_changed'));
+  }
+
+  static getLearningGames(): LearningGame[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.LEARNING_GAMES);
+      return data ? JSON.parse(data) : INITIAL_LEARNING_GAMES;
+    } catch {
+      return INITIAL_LEARNING_GAMES;
+    }
+  }
+
+  static saveLearningGames(games: LearningGame[]): void {
+    localStorage.setItem(STORAGE_KEYS.LEARNING_GAMES, JSON.stringify(games));
+    this.pushCurrentStateToCloud();
+    window.dispatchEvent(new Event('soul_data_changed'));
+  }
+
+  // -------------------------------------------------------------
+  // COMMUNICATION & CONFIDENCE METHODS
+  // -------------------------------------------------------------
+  static getCommunicationActivities(): CommunicationActivity[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.COMMUNICATION_ACTIVITIES);
+      return data ? JSON.parse(data) : INITIAL_COMMUNICATION_ACTIVITIES;
+    } catch {
+      return INITIAL_COMMUNICATION_ACTIVITIES;
+    }
+  }
+
+  static saveCommunicationActivities(activities: CommunicationActivity[]): void {
+    localStorage.setItem(STORAGE_KEYS.COMMUNICATION_ACTIVITIES, JSON.stringify(activities));
+    this.pushCurrentStateToCloud();
+    window.dispatchEvent(new Event('soul_data_changed'));
+  }
+
+  static logCommunicationSession(activityId: string): void {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const activities = this.getCommunicationActivities();
+    const updated = activities.map(a => {
+      if (a.id === activityId) {
+        const set = new Set(a.completedDates);
+        set.add(todayStr);
+        return { ...a, completedDates: Array.from(set) };
+      }
+      return a;
+    });
+    this.saveCommunicationActivities(updated);
+  }
+
+  static getConfidenceChallenges(): ConfidenceChallenge[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.CONFIDENCE_CHALLENGES);
+      return data ? JSON.parse(data) : INITIAL_CONFIDENCE_CHALLENGES;
+    } catch {
+      return INITIAL_CONFIDENCE_CHALLENGES;
+    }
+  }
+
+  static saveConfidenceChallenges(challenges: ConfidenceChallenge[]): void {
+    localStorage.setItem(STORAGE_KEYS.CONFIDENCE_CHALLENGES, JSON.stringify(challenges));
+    this.pushCurrentStateToCloud();
+    window.dispatchEvent(new Event('soul_data_changed'));
+  }
+
+  static toggleConfidenceChallenge(challengeId: string): void {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const challenges = this.getConfidenceChallenges();
+    const updated = challenges.map(c => {
+      if (c.id === challengeId) {
+        const isDone = c.completedDates.includes(todayStr);
+        const nextDates = isDone ? c.completedDates.filter(d => d !== todayStr) : [...c.completedDates, todayStr];
+        return { ...c, completedDates: nextDates };
+      }
+      return c;
+    });
+    this.saveConfidenceChallenges(updated);
+  }
+
+  // -------------------------------------------------------------
+  // DAILY & WEEKLY REVIEWS METHODS
+  // -------------------------------------------------------------
+  static getDailyReviews(): DailyReviewEntry[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.DAILY_REVIEWS);
+      return data ? JSON.parse(data) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  static saveDailyReview(entry: DailyReviewEntry): void {
+    const existing = this.getDailyReviews();
+    const filtered = existing.filter(r => r.date !== entry.date);
+    const updated = [entry, ...filtered];
+    localStorage.setItem(STORAGE_KEYS.DAILY_REVIEWS, JSON.stringify(updated));
+    this.pushCurrentStateToCloud();
+    window.dispatchEvent(new Event('soul_data_changed'));
+  }
+
   /**
    * Helper to push all local state to Supabase in the background
    */
@@ -401,6 +703,16 @@ export class StorageService {
         msbteCalendar: this.getMsbteCalendar(),
         performance: this.getAcademicPerformance(),
         roastSettings: this.getRoastSettings(),
+        masterGoals: this.getMasterGoals(),
+        weeklyTargets: this.getWeeklyTargets(),
+        dailyRoutine: this.getDailyRoutine(),
+        technicalTopics: this.getTechnicalTopics(),
+        weeklyProjects: this.getWeeklyProjects(),
+        skillOfTheWeek: this.getSkillOfTheWeek(),
+        learningGames: this.getLearningGames(),
+        communicationActivities: this.getCommunicationActivities(),
+        confidenceChallenges: this.getConfidenceChallenges(),
+        dailyReviews: this.getDailyReviews(),
       });
     } catch (e) {
       console.warn('Could not sync to Supabase:', e);
@@ -445,6 +757,36 @@ export class StorageService {
       if ((cloudData as any).roastSettings) {
         localStorage.setItem(STORAGE_KEYS.ROAST_SETTINGS, JSON.stringify((cloudData as any).roastSettings));
       }
+      if (Array.isArray((cloudData as any).masterGoals)) {
+        localStorage.setItem(STORAGE_KEYS.MASTER_GOALS, JSON.stringify((cloudData as any).masterGoals));
+      }
+      if (Array.isArray((cloudData as any).weeklyTargets)) {
+        localStorage.setItem(STORAGE_KEYS.WEEKLY_TARGETS, JSON.stringify((cloudData as any).weeklyTargets));
+      }
+      if ((cloudData as any).dailyRoutine) {
+        localStorage.setItem(STORAGE_KEYS.DAILY_ROUTINE, JSON.stringify((cloudData as any).dailyRoutine));
+      }
+      if (Array.isArray((cloudData as any).technicalTopics)) {
+        localStorage.setItem(STORAGE_KEYS.TECHNICAL_TOPICS, JSON.stringify((cloudData as any).technicalTopics));
+      }
+      if (Array.isArray((cloudData as any).weeklyProjects)) {
+        localStorage.setItem(STORAGE_KEYS.WEEKLY_PROJECTS, JSON.stringify((cloudData as any).weeklyProjects));
+      }
+      if ((cloudData as any).skillOfTheWeek) {
+        localStorage.setItem(STORAGE_KEYS.SKILL_OF_THE_WEEK, JSON.stringify((cloudData as any).skillOfTheWeek));
+      }
+      if (Array.isArray((cloudData as any).learningGames)) {
+        localStorage.setItem(STORAGE_KEYS.LEARNING_GAMES, JSON.stringify((cloudData as any).learningGames));
+      }
+      if (Array.isArray((cloudData as any).communicationActivities)) {
+        localStorage.setItem(STORAGE_KEYS.COMMUNICATION_ACTIVITIES, JSON.stringify((cloudData as any).communicationActivities));
+      }
+      if (Array.isArray((cloudData as any).confidenceChallenges)) {
+        localStorage.setItem(STORAGE_KEYS.CONFIDENCE_CHALLENGES, JSON.stringify((cloudData as any).confidenceChallenges));
+      }
+      if (Array.isArray((cloudData as any).dailyReviews)) {
+        localStorage.setItem(STORAGE_KEYS.DAILY_REVIEWS, JSON.stringify((cloudData as any).dailyReviews));
+      }
 
       window.dispatchEvent(new Event('soul_data_changed'));
       return true;
@@ -470,6 +812,17 @@ export class StorageService {
     localStorage.removeItem(STORAGE_KEYS.PERFORMANCE);
     localStorage.removeItem(STORAGE_KEYS.ROAST_SETTINGS);
     localStorage.removeItem(STORAGE_KEYS.ROAST_LOG);
+    localStorage.removeItem(STORAGE_KEYS.MASTER_GOALS);
+    localStorage.removeItem(STORAGE_KEYS.WEEKLY_TARGETS);
+    localStorage.removeItem(STORAGE_KEYS.DAILY_ROUTINE);
+    localStorage.removeItem(STORAGE_KEYS.TECHNICAL_TOPICS);
+    localStorage.removeItem(STORAGE_KEYS.WEEKLY_PROJECTS);
+    localStorage.removeItem(STORAGE_KEYS.SKILL_OF_THE_WEEK);
+    localStorage.removeItem(STORAGE_KEYS.LEARNING_GAMES);
+    localStorage.removeItem(STORAGE_KEYS.COMMUNICATION_ACTIVITIES);
+    localStorage.removeItem(STORAGE_KEYS.CONFIDENCE_CHALLENGES);
+    localStorage.removeItem(STORAGE_KEYS.DAILY_REVIEWS);
+    localStorage.removeItem(STORAGE_KEYS.WEEKLY_REVIEWS);
     this.pushCurrentStateToCloud();
     window.dispatchEvent(new Event('soul_data_changed'));
   }
@@ -490,6 +843,16 @@ export class StorageService {
       msbteCalendar: this.getMsbteCalendar(),
       performance: this.getAcademicPerformance(),
       roastSettings: this.getRoastSettings(),
+      masterGoals: this.getMasterGoals(),
+      weeklyTargets: this.getWeeklyTargets(),
+      dailyRoutine: this.getDailyRoutine(),
+      technicalTopics: this.getTechnicalTopics(),
+      weeklyProjects: this.getWeeklyProjects(),
+      skillOfTheWeek: this.getSkillOfTheWeek(),
+      learningGames: this.getLearningGames(),
+      communicationActivities: this.getCommunicationActivities(),
+      confidenceChallenges: this.getConfidenceChallenges(),
+      dailyReviews: this.getDailyReviews(),
       exportedAt: new Date().toISOString(),
     };
     return JSON.stringify(data, null, 2);
@@ -511,6 +874,16 @@ export class StorageService {
       if (parsed.msbteCalendar) localStorage.setItem(STORAGE_KEYS.MSBTE_CALENDAR, JSON.stringify(parsed.msbteCalendar));
       if (parsed.performance) localStorage.setItem(STORAGE_KEYS.PERFORMANCE, JSON.stringify(parsed.performance));
       if (parsed.roastSettings) localStorage.setItem(STORAGE_KEYS.ROAST_SETTINGS, JSON.stringify(parsed.roastSettings));
+      if (parsed.masterGoals) localStorage.setItem(STORAGE_KEYS.MASTER_GOALS, JSON.stringify(parsed.masterGoals));
+      if (parsed.weeklyTargets) localStorage.setItem(STORAGE_KEYS.WEEKLY_TARGETS, JSON.stringify(parsed.weeklyTargets));
+      if (parsed.dailyRoutine) localStorage.setItem(STORAGE_KEYS.DAILY_ROUTINE, JSON.stringify(parsed.dailyRoutine));
+      if (parsed.technicalTopics) localStorage.setItem(STORAGE_KEYS.TECHNICAL_TOPICS, JSON.stringify(parsed.technicalTopics));
+      if (parsed.weeklyProjects) localStorage.setItem(STORAGE_KEYS.WEEKLY_PROJECTS, JSON.stringify(parsed.weeklyProjects));
+      if (parsed.skillOfTheWeek) localStorage.setItem(STORAGE_KEYS.SKILL_OF_THE_WEEK, JSON.stringify(parsed.skillOfTheWeek));
+      if (parsed.learningGames) localStorage.setItem(STORAGE_KEYS.LEARNING_GAMES, JSON.stringify(parsed.learningGames));
+      if (parsed.communicationActivities) localStorage.setItem(STORAGE_KEYS.COMMUNICATION_ACTIVITIES, JSON.stringify(parsed.communicationActivities));
+      if (parsed.confidenceChallenges) localStorage.setItem(STORAGE_KEYS.CONFIDENCE_CHALLENGES, JSON.stringify(parsed.confidenceChallenges));
+      if (parsed.dailyReviews) localStorage.setItem(STORAGE_KEYS.DAILY_REVIEWS, JSON.stringify(parsed.dailyReviews));
       this.pushCurrentStateToCloud();
       window.dispatchEvent(new Event('soul_data_changed'));
       return true;

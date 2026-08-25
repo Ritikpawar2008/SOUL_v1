@@ -282,3 +282,190 @@ export interface AIRecommendation {
   priorityScore: number;
   deadlineWarning?: string;
 }
+
+// -------------------------------------------------------------
+// 4. PERSONAL GROWTH & MASTER GOAL MANAGEMENT TYPES
+// -------------------------------------------------------------
+
+export interface GoalMilestone {
+  id: string;
+  title: string;
+  description: string;
+  completed: boolean;
+  targetWeek: number;
+  completedDate?: string;
+}
+
+export interface MasterGoal {
+  id: string;
+  rawPrompt: string; // e.g. "I want to become very strong technically"
+  title: string;
+  category: 'technical' | 'academic' | 'project' | 'communication' | 'habit' | 'creative' | 'general';
+  reason: string;
+  deadline: string; // YYYY-MM-DD
+  estimatedHoursTotal: number;
+  priority: PriorityLevel;
+  progress: number; // 0 to 100
+  weeklyTargetsSummary: string[];
+  dailyActions: string[];
+  milestones: GoalMilestone[];
+  createdAt: string;
+  lastUpdated?: string;
+}
+
+export type WeeklyTargetCategory = 'academic' | 'technical' | 'personal' | 'creative' | 'exploration' | 'entertainment';
+
+export interface WeeklyTarget {
+  id: string;
+  category: WeeklyTargetCategory;
+  title: string;
+  targetCount: number;
+  currentCount: number;
+  unit: string; // "Units", "Sessions", "Websites", "Skills", "Activities", "Movies"
+  subjectCode?: string; // "CLC", "OSY", "STE" if academic
+  notes?: string;
+  weekIdentifier: string; // e.g. "2026-W35"
+}
+
+export interface DailyRoutineConfig {
+  wakeUpTime: string;       // "06:30"
+  sleepTime: string;        // "23:00"
+  breakfastTime: string;    // "08:00"
+  lunchTime: string;        // "13:00"
+  dinnerTime: string;       // "19:00"
+  gymStartTime: string;     // "16:00"
+  gymEndTime: string;       // "19:00"
+  personalTimeStart: string;// "22:45"
+  personalTimeEnd: string;  // "23:30"
+  notes?: string;
+}
+
+export type TechnicalTrackId = 'programming' | 'computer_science' | 'development' | 'ai' | 'linux';
+
+export type LearnPracticeStep = 'learn' | 'practice' | 'build' | 'explain';
+
+export interface TechnicalTopic {
+  id: string;
+  trackId: TechnicalTrackId;
+  title: string;
+  level: 'beginner' | 'intermediate' | 'advanced' | 'mastery';
+  order: number;
+  learnConcept: string;
+  practicePrompt: string;
+  buildPrompt: string;
+  explainQuestion: string;
+  status: 'not_started' | 'learning' | 'practicing' | 'building' | 'explaining' | 'completed';
+  userExplanation?: string;
+  completedAt?: string;
+  resources?: { title: string; link: string }[];
+}
+
+export interface ProjectTaskStep {
+  id: string;
+  stepNumber: number;
+  title: string;
+  phase: 'idea' | 'planning' | 'ui_ux' | 'frontend' | 'backend' | 'database' | 'ai_api' | 'testing' | 'deployment' | 'docs';
+  completed: boolean;
+}
+
+export interface WeeklyProject {
+  id: string;
+  cadence: 'weekly' | 'biweekly';
+  title: string;
+  idea: string;
+  problem: string;
+  features: string[];
+  techStack: string[];
+  steps: ProjectTaskStep[];
+  progress: number; // 0-100
+  deadline: string; // YYYY-MM-DD
+  githubUrl?: string;
+  liveUrl?: string;
+  learnings?: string;
+  status: 'planning' | 'in_progress' | 'deployed' | 'paused_for_exams';
+  createdAt: string;
+}
+
+export interface SkillOfTheWeek {
+  id: string;
+  weekIdentifier: string;
+  title: string;
+  category: 'technical' | 'creative' | 'business' | 'communication' | 'productivity' | 'practical' | 'digital';
+  whatItIs: string;
+  whyItMatters: string;
+  resources: { title: string; link: string; type: string }[];
+  practiceTask: string;
+  miniChallenge: string;
+  completionTest: string;
+  completed: boolean;
+  userNotes?: string;
+}
+
+export interface LearningGame {
+  id: string;
+  title: string;
+  gameType: 'chess' | 'coding_game' | 'logic_game' | 'typing_game' | 'simulation' | 'custom';
+  skillDeveloped: string;
+  targetSessionsPerWeek: number;
+  completedSessionsThisWeek: number;
+  category: 'learning_game' | 'pure_entertainment';
+}
+
+export interface CommunicationActivity {
+  id: string;
+  type: 'speaking_5min' | 'technical_explanation' | 'vocabulary_3words' | 'conversation' | 'presentation_2min';
+  title: string;
+  prompt: string;
+  guide: string;
+  vocabularyWords?: { word: string; meaning: string; example: string }[];
+  completedDates: string[];
+}
+
+export interface ConfidenceChallenge {
+  id: string;
+  title: string;
+  level: 1 | 2 | 3 | 4 | 5;
+  description: string;
+  tips: string;
+  completedDates: string[];
+}
+
+export interface DailyKnowledgeItem {
+  id: string;
+  date: string; // YYYY-MM-DD
+  spaceByte: { fact: string; deepDive: string };
+  techByte: { question: string; explanation: string; takeaway: string };
+  computerByte: { title: string; concept: string };
+  lifeByte: { principle: string; application: string };
+}
+
+export interface DailyReviewEntry {
+  date: string; // YYYY-MM-DD
+  academicAnswer: string;
+  technicalAnswer: string;
+  projectAnswer: string;
+  communicationDone: boolean;
+  routineMaintained: boolean;
+  knowledgeLearned: boolean;
+  dailyScore: number; // 0-100
+  tomorrowRecommendation: string;
+  timestamp: string;
+}
+
+export interface WeeklyReviewData {
+  weekIdentifier: string;
+  academicUnitsCompleted: number;
+  revisionsCompleted: number;
+  technicalHours: number;
+  linuxSessions: number;
+  projectProgress: number;
+  communicationSessions: number;
+  skillLearned: boolean;
+  entertainmentSessions: number;
+  gymConsistencyPercent: number;
+  overallScore: number; // 0-100
+  whatWentWell: string[];
+  whatWasIgnored: string[];
+  nextWeekPlan: string[];
+}
+

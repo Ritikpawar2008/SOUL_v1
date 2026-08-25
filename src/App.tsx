@@ -9,7 +9,17 @@ import {
   PostGymSlot,
   MSBTECalendarEvent,
   AcademicPerformanceData,
-  SubjectMarksEntry
+  SubjectMarksEntry,
+  MasterGoal,
+  WeeklyTarget,
+  DailyRoutineConfig,
+  TechnicalTopic,
+  WeeklyProject,
+  SkillOfTheWeek,
+  LearningGame,
+  CommunicationActivity,
+  ConfidenceChallenge,
+  DailyReviewEntry
 } from './types';
 import { StorageService } from './lib/storage';
 import { Header } from './components/Header';
@@ -43,6 +53,18 @@ export default function App() {
   const [postGymRoutine, setPostGymRoutine] = useState<PostGymSlot[]>(StorageService.getPostGymRoutine());
   const [msbteCalendar, setMsbteCalendar] = useState<MSBTECalendarEvent[]>(StorageService.getMsbteCalendar());
   const [performance, setPerformance] = useState<AcademicPerformanceData>(StorageService.getAcademicPerformance());
+
+  // Personal Growth & Master Goal States
+  const [masterGoals, setMasterGoals] = useState<MasterGoal[]>(StorageService.getMasterGoals());
+  const [weeklyTargets, setWeeklyTargets] = useState<WeeklyTarget[]>(StorageService.getWeeklyTargets());
+  const [dailyRoutine, setDailyRoutine] = useState<DailyRoutineConfig>(StorageService.getDailyRoutine());
+  const [technicalTopics, setTechnicalTopics] = useState<TechnicalTopic[]>(StorageService.getTechnicalTopics());
+  const [weeklyProjects, setWeeklyProjects] = useState<WeeklyProject[]>(StorageService.getWeeklyProjects());
+  const [skillOfTheWeek, setSkillOfTheWeek] = useState<SkillOfTheWeek>(StorageService.getSkillOfTheWeek());
+  const [learningGames, setLearningGames] = useState<LearningGame[]>(StorageService.getLearningGames());
+  const [communicationActivities, setCommunicationActivities] = useState<CommunicationActivity[]>(StorageService.getCommunicationActivities());
+  const [confidenceChallenges, setConfidenceChallenges] = useState<ConfidenceChallenge[]>(StorageService.getConfidenceChallenges());
+  const [dailyReviews, setDailyReviews] = useState<DailyReviewEntry[]>(StorageService.getDailyReviews());
 
   // Clock & Time Simulation State
   const [systemTime, setSystemTime] = useState<Date>(new Date());
@@ -161,6 +183,16 @@ export default function App() {
         setPostGymRoutine(StorageService.getPostGymRoutine());
         setMsbteCalendar(StorageService.getMsbteCalendar());
         setPerformance(StorageService.getAcademicPerformance());
+        setMasterGoals(StorageService.getMasterGoals());
+        setWeeklyTargets(StorageService.getWeeklyTargets());
+        setDailyRoutine(StorageService.getDailyRoutine());
+        setTechnicalTopics(StorageService.getTechnicalTopics());
+        setWeeklyProjects(StorageService.getWeeklyProjects());
+        setSkillOfTheWeek(StorageService.getSkillOfTheWeek());
+        setLearningGames(StorageService.getLearningGames());
+        setCommunicationActivities(StorageService.getCommunicationActivities());
+        setConfidenceChallenges(StorageService.getConfidenceChallenges());
+        setDailyReviews(StorageService.getDailyReviews());
       }
     });
   }, []);
@@ -177,6 +209,16 @@ export default function App() {
       setPostGymRoutine(StorageService.getPostGymRoutine());
       setMsbteCalendar(StorageService.getMsbteCalendar());
       setPerformance(StorageService.getAcademicPerformance());
+      setMasterGoals(StorageService.getMasterGoals());
+      setWeeklyTargets(StorageService.getWeeklyTargets());
+      setDailyRoutine(StorageService.getDailyRoutine());
+      setTechnicalTopics(StorageService.getTechnicalTopics());
+      setWeeklyProjects(StorageService.getWeeklyProjects());
+      setSkillOfTheWeek(StorageService.getSkillOfTheWeek());
+      setLearningGames(StorageService.getLearningGames());
+      setCommunicationActivities(StorageService.getCommunicationActivities());
+      setConfidenceChallenges(StorageService.getConfidenceChallenges());
+      setDailyReviews(StorageService.getDailyReviews());
     };
     window.addEventListener('soul_data_changed', handleStorageChange);
     window.addEventListener('soul_supabase_config_changed', handleStorageChange);
@@ -236,6 +278,72 @@ export default function App() {
     setPerformance(StorageService.getAcademicPerformance());
   };
 
+  // Growth Handlers
+  const handleSaveMasterGoal = (goal: MasterGoal) => {
+    StorageService.addMasterGoal(goal);
+    setMasterGoals(StorageService.getMasterGoals());
+  };
+
+  const handleDeleteMasterGoal = (goalId: string) => {
+    StorageService.deleteMasterGoal(goalId);
+    setMasterGoals(StorageService.getMasterGoals());
+  };
+
+  const handleSaveWeeklyTargets = (targets: WeeklyTarget[]) => {
+    StorageService.saveWeeklyTargets(targets);
+    setWeeklyTargets(StorageService.getWeeklyTargets());
+  };
+
+  const handleUpdateWeeklyTargetProgress = (id: string, delta: number) => {
+    StorageService.updateWeeklyTargetProgress(id, delta);
+    setWeeklyTargets(StorageService.getWeeklyTargets());
+  };
+
+  const handleSaveDailyRoutine = (routine: DailyRoutineConfig) => {
+    StorageService.saveDailyRoutine(routine);
+    setDailyRoutine(StorageService.getDailyRoutine());
+  };
+
+  const handleUpdateTechnicalTopicStatus = (id: string, status: TechnicalTopic['status'], userExplanation?: string) => {
+    StorageService.updateTechnicalTopicStatus(id, status, userExplanation);
+    setTechnicalTopics(StorageService.getTechnicalTopics());
+  };
+
+  const handleSaveWeeklyProjects = (projects: WeeklyProject[]) => {
+    StorageService.saveWeeklyProjects(projects);
+    setWeeklyProjects(StorageService.getWeeklyProjects());
+  };
+
+  const handleToggleProjectStep = (projectId: string, stepId: string) => {
+    StorageService.toggleProjectStep(projectId, stepId);
+    setWeeklyProjects(StorageService.getWeeklyProjects());
+  };
+
+  const handleSaveSkillOfTheWeek = (skill: SkillOfTheWeek) => {
+    StorageService.saveSkillOfTheWeek(skill);
+    setSkillOfTheWeek(StorageService.getSkillOfTheWeek());
+  };
+
+  const handleSaveLearningGames = (games: LearningGame[]) => {
+    StorageService.saveLearningGames(games);
+    setLearningGames(StorageService.getLearningGames());
+  };
+
+  const handleLogCommunicationActivity = (activityId: string) => {
+    StorageService.logCommunicationSession(activityId);
+    setCommunicationActivities(StorageService.getCommunicationActivities());
+  };
+
+  const handleToggleConfidenceChallenge = (challengeId: string) => {
+    StorageService.toggleConfidenceChallenge(challengeId);
+    setConfidenceChallenges(StorageService.getConfidenceChallenges());
+  };
+
+  const handleSaveDailyReview = (entry: DailyReviewEntry) => {
+    StorageService.saveDailyReview(entry);
+    setDailyReviews(StorageService.getDailyReviews());
+  };
+
   const handleResetAllData = () => {
     StorageService.resetToDefault();
     setPreferences(StorageService.getPreferences());
@@ -247,6 +355,16 @@ export default function App() {
     setPostGymRoutine(StorageService.getPostGymRoutine());
     setMsbteCalendar(StorageService.getMsbteCalendar());
     setPerformance(StorageService.getAcademicPerformance());
+    setMasterGoals(StorageService.getMasterGoals());
+    setWeeklyTargets(StorageService.getWeeklyTargets());
+    setDailyRoutine(StorageService.getDailyRoutine());
+    setTechnicalTopics(StorageService.getTechnicalTopics());
+    setWeeklyProjects(StorageService.getWeeklyProjects());
+    setSkillOfTheWeek(StorageService.getSkillOfTheWeek());
+    setLearningGames(StorageService.getLearningGames());
+    setCommunicationActivities(StorageService.getCommunicationActivities());
+    setConfidenceChallenges(StorageService.getConfidenceChallenges());
+    setDailyReviews(StorageService.getDailyReviews());
   };
 
   // Study Session Handlers
@@ -446,7 +564,31 @@ export default function App() {
             history={history}
             subjects={subjects}
             tasks={tasks}
+            masterGoals={masterGoals}
+            weeklyTargets={weeklyTargets}
+            dailyRoutine={dailyRoutine}
+            technicalTopics={technicalTopics}
+            weeklyProjects={weeklyProjects}
+            skillOfTheWeek={skillOfTheWeek}
+            learningGames={learningGames}
+            communicationActivities={communicationActivities}
+            confidenceChallenges={confidenceChallenges}
+            dailyReviews={dailyReviews}
+            roastSettings={preferences.roastSettings}
             onUpdateHabits={handleUpdateHabits}
+            onSaveMasterGoal={handleSaveMasterGoal}
+            onDeleteMasterGoal={handleDeleteMasterGoal}
+            onSaveWeeklyTargets={handleSaveWeeklyTargets}
+            onUpdateWeeklyTargetProgress={handleUpdateWeeklyTargetProgress}
+            onSaveDailyRoutine={handleSaveDailyRoutine}
+            onUpdateTechnicalTopicStatus={handleUpdateTechnicalTopicStatus}
+            onSaveWeeklyProjects={handleSaveWeeklyProjects}
+            onToggleProjectStep={handleToggleProjectStep}
+            onSaveSkillOfTheWeek={handleSaveSkillOfTheWeek}
+            onSaveLearningGames={handleSaveLearningGames}
+            onLogCommunicationActivity={handleLogCommunicationActivity}
+            onToggleConfidenceChallenge={handleToggleConfidenceChallenge}
+            onSaveDailyReview={handleSaveDailyReview}
           />
         )}
 

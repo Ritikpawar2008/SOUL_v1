@@ -37,7 +37,7 @@ export const Navigation: React.FC<NavigationProps> = ({
     { id: 'planner', number: '02', label: 'PLANNER', icon: CalendarDays },
     { id: 'academics', number: '03', label: 'ACADEMICS', icon: BookOpen, badge: (pendingTasksCount + dueRevisionsCount) > 0 ? (pendingTasksCount + dueRevisionsCount) : undefined },
     { id: 'focus', number: '04', label: 'FOCUS', icon: Target },
-    { id: 'goals', number: '05', label: 'GOALS', icon: Flame },
+    { id: 'goals', number: '05', label: 'GROWTH & GOALS', icon: Flame },
     { id: 'life', number: '06', label: 'LIFE', icon: Coffee },
     { id: 'soul_ai', number: '07', label: 'AI CO-PILOT', icon: Sparkles },
   ];

@@ -17,7 +17,12 @@ import {
   ArrowRight,
   RefreshCw,
   Award,
-  Zap
+  Zap,
+  Rocket,
+  Target,
+  MessageSquare,
+  Compass,
+  Moon
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { 
@@ -33,6 +38,7 @@ import {
   UserPreferences,
   PostGymSlot
 } from '../types';
+import { GrowthEngine } from '../lib/growthEngine';
 import { 
   calculateAvailableSlots, 
   checkScheduleConflict, 
@@ -383,6 +389,83 @@ export const TodayView: React.FC<TodayViewProps> = ({
           </button>
         </div>
       )}
+
+      {/* FEATURE 20: DAILY AI CHECK-IN & TODAY'S MISSION */}
+      <section className="p-5 md:p-6 bg-[#0C1214] border border-cyan-500/40 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-cyan-400 font-mono text-xs font-bold uppercase tracking-widest">
+            <Sparkles className="w-4 h-4" />
+            <span>DAILY AI CHECK-IN &middot; TODAY&apos;S MISSION</span>
+          </div>
+          <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider">
+            BATCH C &middot; 98% TARGET ALIGNMENT
+          </span>
+        </div>
+
+        {/* Daily Mission Dashboard Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 font-mono text-xs">
+          <div className="p-3 bg-white/5 border border-white/10 space-y-1">
+            <span className="text-[9px] text-white/40 uppercase tracking-widest block">COLLEGE / LABS</span>
+            <span className="text-sm font-bold text-white uppercase line-clamp-1">
+              {todayClasses.length > 0 ? todayClasses[0].title : 'Lectures & Labs Active'}
+            </span>
+          </div>
+
+          <div className="p-3 bg-white/5 border border-white/10 space-y-1">
+            <span className="text-[9px] text-orange-400 uppercase tracking-widest block font-bold">FIXED GYM TIME</span>
+            <span className="text-sm font-bold text-white">04:00 PM &ndash; 07:00 PM</span>
+          </div>
+
+          <div className="p-3 bg-white/5 border border-white/10 space-y-1">
+            <span className="text-[9px] text-emerald-400 uppercase tracking-widest block font-bold">TECHNICAL BEAST</span>
+            <span className="text-sm font-bold text-white">Linux &amp; Systems Drill</span>
+          </div>
+
+          <div className="p-3 bg-white/5 border border-white/10 space-y-1">
+            <span className="text-[9px] text-purple-400 uppercase tracking-widest block font-bold">PROJECT SPRINT</span>
+            <span className="text-sm font-bold text-white">Build &amp; Ship Sprints</span>
+          </div>
+        </div>
+
+        {/* Top Mission Callout */}
+        <div className="p-3.5 bg-cyan-950/20 border border-cyan-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 font-mono">
+          <div className="space-y-0.5">
+            <span className="text-[10px] text-cyan-400 font-bold uppercase tracking-widest block">
+              🎯 TODAY&apos;S PRIME DIRECTIVE
+            </span>
+            <p className="text-xs text-white/90 font-bold">
+              {topRec.title || 'Complete your core CLC / OSY study module and maintain non-negotiable 4-7 PM gym focus.'}
+            </p>
+          </div>
+
+          <button
+            onClick={() => onNavigateTab('goals')}
+            className="px-4 py-2 bg-cyan-400 hover:bg-cyan-300 text-black text-xs font-bold uppercase tracking-wider transition cursor-pointer shrink-0 flex items-center gap-1"
+          >
+            <span>VIEW GROWTH →</span>
+          </button>
+        </div>
+      </section>
+
+      {/* FEATURE 17 & 18: DAILY KNOWLEDGE & SPACE BYTE CARD */}
+      <section className="p-4 md:p-5 bg-gradient-to-r from-[#060D1A] to-[#0A1628] border border-blue-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-blue-400 text-[10px] font-bold uppercase tracking-widest">
+            <Rocket className="w-3.5 h-3.5 text-cyan-400" />
+            <span>SPACE BYTE &middot; DAILY COSMIC KNOWLEDGE</span>
+          </div>
+          <p className="text-xs text-white/90 font-bold leading-relaxed">
+            &ldquo;{GrowthEngine.getTodayKnowledge().spaceByte.fact}&rdquo;
+          </p>
+        </div>
+
+        <button
+          onClick={() => onNavigateTab('goals')}
+          className="px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/30 text-[10px] font-bold uppercase tracking-wider transition cursor-pointer shrink-0"
+        >
+          EXPLORE BYTE →
+        </button>
+      </section>
 
       {/* 02. "WHAT SHOULD I DO NOW?" HERO SECTION */}
       <section className="space-y-4">
